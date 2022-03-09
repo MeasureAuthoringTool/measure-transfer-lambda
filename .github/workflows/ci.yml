@@ -1,0 +1,62 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lambda-function
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Install node dependencies
+        run: npm ci
+
+      - name: Audit node modules for security vulnerabilities
+        run: npm audit
+
+      - name: Lint the source code
+        run: npm run-script lint
+
+      - name: Check prettier formatting
+        run: npm run-script prettier
+
+      - name: Execute test coverage
+        run: npm run-script test
+
+      - name: Store the coverage report as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage
+          path: coverage/lcov.info
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          file: coverage/lcov.info
+          fail_ci_if_error: true

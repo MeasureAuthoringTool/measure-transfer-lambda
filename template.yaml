@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  measure-transfer-lambda
+
+  SAM Template for measure-transfer-lambda
+  
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+#Resources:
+#  MeasureTransferLambda:
+#    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+#    Properties:
+#      CodeUri: lambda-function/
+#      Handler: app.lambdaHandler
+#      Runtime: nodejs14.x
+
+Resources:
+  MeasureBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: mat-madie-measures
+
+  MeasureTransferLambda:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: lambda-function/
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Events:
+        MatS3PutMeasureTrigger:
+          Type: S3 # More info about S3 Event Source: https://github.com/aws/serverless-application-model/blob/master/versions/2016-10-31.md#s3
+          Properties:
+            Bucket: !Ref MeasureBucket # bucket must be created in the same template
+            Events: s3:ObjectCreated:Put
+
+    Metadata: # Manage esbuild properties
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "es2020"
+        Sourcemap: true
+        EntryPoints:
+        - src/app.ts
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/aws/serverless-application-model/blob/master/docs/internals/generated_resources.rst#s3
+  S3Bucket:
+    Description: "Bucket Created using this template."
+    Value: !Ref MeasureBucket
+  MeasureTransferLambda:
+    Description: "MeasureTransferLambda Function ARN"
+    Value: !GetAtt MeasureTransferLambda.Arn
+  MeasureTransferLambdaIamRole:
+    Description: "Implicit IAM Role created for MeasureTransferLambda function"
+    Value: !GetAtt MeasureTransferLambdaRole.Arn
