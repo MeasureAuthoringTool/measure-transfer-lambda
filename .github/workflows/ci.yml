@@ -43,8 +43,8 @@ jobs:
       - name: Lint the source code
         run: npm run-script lint
 
-      - name: Check prettier formatting
-        run: npm run-script prettier
+#      - name: Check prettier formatting
+#        run: npm run-script prettier
 
       - name: Execute test coverage
         run: npm run-script test

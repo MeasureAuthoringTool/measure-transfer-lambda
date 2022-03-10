@@ -9,7 +9,7 @@ import { s3Client } from "./s3Client.js";
  * Event doc: https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-content-structure.html
  * @param {Object} event - S3
  *
- * @returns {Promise} object - GetObjectOutput
+ * @returns {Promise} object - string representation of measure json
  *
  */
 export const lambdaHandler = async (event: S3Event): Promise<string> => {
