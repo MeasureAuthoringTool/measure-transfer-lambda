@@ -5,9 +5,9 @@ Lambda function reads the measure json file uploaded to S3 bucket(see `./templat
 
 This project contains source code and supporting files that you can deploy with the SAM CLI. It includes the following files and folders.
 
-- lambda-function - Code for the application's Lambda function.
-- lambda-function/tests - Unit tests for the application code. 
-- template.yaml - A template that defines the application's AWS resources.
+  - lambda-function - Code for the application's Lambda function.
+  - lambda-function/tests - Unit tests for the application code. 
+  - template.yaml - A template that defines the application's AWS resources.
 
 ## Build and test locally
 We need LocalStack up and running locally to deploy lambda functions and tests. Steps to install and run LocalStack can be found [here](https://docs.localstack.cloud/get-started/).
