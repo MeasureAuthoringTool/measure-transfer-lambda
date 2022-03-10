@@ -15,18 +15,16 @@ import { s3Client } from "./s3Client.js";
 export const lambdaHandler = async (event: S3Event): Promise<string> => {
   console.log("Lambda handler started.....");
   const bucket: string = event.Records[0].s3.bucket.name;
-  const key: string = decodeURIComponent(
-    event.Records[0].s3.object.key.replace(/\+/g, ' '));
+  const key: string = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
   console.log(`Source bucket:${bucket}, file name: ${key}`);
-  
+
   const params = {
     Bucket: bucket,
     Key: key,
   };
-  
+
   try {
     const { Body } = await s3Client.send(new GetObjectCommand(params));
-    
     const bodyContents = await streamToString(Body as Readable);
     console.log("Contents:", bodyContents);
     console.log("Lambda execution completed...");

@@ -8,4 +8,4 @@ export const streamToString = async (stream: Readable): Promise<string> => {
     stream.on("error", reject);
     stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
   });
-}
+};
