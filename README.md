@@ -10,7 +10,7 @@ This project contains source code and supporting files that you can deploy with 
   - template.yaml - A template that defines the application's AWS resources.
 
 ## Build and test locally
-We need LocalStack up and running locally to deploy lambda functions and tests. Steps to install and run LocalStack can be found [here](https://docs.localstack.cloud/get-started/).
+We need LocalStack up and running locally to deploy lambda function and test. Steps to install and run LocalStack can be found [here](https://docs.localstack.cloud/get-started/).
 Easiest way to fire up LocalStack is by using [docker-compose](https://docs.localstack.cloud/get-started/#docker-compose)
 
 Build your application with the `sam build` command.
@@ -23,7 +23,7 @@ The SAM CLI installs dependencies defined in `lambda-function/package.json`, com
 
 You can use LocalStack to deploy this lambda function locally and test it by uploading the test measure provided in `lambda-function/tests/fixtures/measure.json`.
 
-Command to deploy lambda functions(make sure you have [`samlocal`](https://github.com/localstack/aws-sam-cli-local) CLI installed in your local machine.):
+Command to deploy lambda function(make sure you have [`samlocal`](https://github.com/localstack/aws-sam-cli-local) CLI installed in your local machine.):
 
 ```bash
 measure-transfer-lambda$ samlocal deploy --guided

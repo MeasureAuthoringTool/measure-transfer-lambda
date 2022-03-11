@@ -5,7 +5,7 @@ import { Readable } from "stream";
 import { s3Client } from "./s3Client.js";
 
 /**
- *
+ * Lambda function handler
  * Event doc: https://docs.aws.amazon.com/AmazonS3/latest/userguide/notification-content-structure.html
  * @param {S3Event} event - S3
  *
