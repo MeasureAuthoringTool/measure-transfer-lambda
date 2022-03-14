@@ -1,0 +1,113 @@
+{
+  "emailId": "john.doe@exploaders.com",
+  "harpId": "john_doe",
+  "manageMeasureDetailModel": {
+    "id": "t634er34er34er34er34er",
+    "measureName": "MedicationDispenseTest",
+    "measureModel": "FHIR",
+    "shortName": "MedicationDispenseTest",
+    "versionNumber": "0.000",
+    "revisionNumber": "1",
+    "measureId": null,
+    "groupName": null,
+    "groupId": "t3rf574g56hgroup-14sd-4b7c-89t4-23we23we23we",
+    "finalizedDate": null,
+    "measFromPeriod": "01/01/2021",
+    "measToPeriod": "12/31/2021",
+    "measScoring": "Cohort",
+    "stewardValue": "SemanticBits",
+    "endorseByNQF": false,
+    "nqfId": null,
+    "description": "MedicationDispenseTest  measure",
+    "copyright": "Teats",
+    "clinicalRecomms": null,
+    "definitions": null,
+    "guidance": null,
+    "transmissionFormat": null,
+    "rationale": null,
+    "improvNotations": "increase",
+    "stratification": null,
+    "referencesList": [],
+    "authorSelectedList": [
+      {
+        "id": "sd3456gh-67hj67-67hj-bf51-23we23we23we",
+        "authorName": "SemanticBits",
+        "orgId": "sd3456gh-67hj67-67hj-bf51-23we23we23we"
+      }
+    ],
+    "stewardSelectedList": null,
+    "measureTypeSelectedList": [
+      {
+        "id": "6",
+        "description": "Process",
+        "abbrName": "PROCESS"
+      }
+    ],
+    "qdsSelectedList": null,
+    "componentMeasuresSelectedList": null,
+    "toCompareAuthor": null,
+    "toCompareMeasure": null,
+    "toCompareComponentMeasures": null,
+    "draft": true,
+    "measureSetId": "12we34rtwt-45rt-45rt-56yu-46ty34rt45fgw2",
+    "valueSetDate": null,
+    "supplementalData": null,
+    "disclaimer": null,
+    "riskAdjustment": null,
+    "rateAggregation": null,
+    "initialPop": null,
+    "denominator": null,
+    "denominatorExclusions": null,
+    "numerator": null,
+    "numeratorExclusions": null,
+    "denominatorExceptions": null,
+    "measurePopulation": null,
+    "measureObservations": null,
+    "eMeasureId": 0,
+    "orgVersionNumber": "0.0.001",
+    "qltyMeasureSetUuid": "12we34er-34rt-56tg-23er-12we34er45rt",
+    "stewardId": "207",
+    "scoringAbbr": "COHORT",
+    "periodModel": {
+      "uuid": "12df45gh-34gh-34gh-23gh-34er34er34er",
+      "startDate": "01/01/2021",
+      "stopDate": "12/31/2021",
+      "calenderYear": false
+    },
+    "endorsement": null,
+    "endorsementId": null,
+    "nqfModel": {
+      "root": "1.12.234.1.123456.4.123.1",
+      "extension": null
+    },
+    "measureOwnerId": "abc34mdf45rfg56m676mf567fds",
+    "measurePopulationExclusions": "",
+    "measureDetailResult": {
+      "usedSteward": {
+        "id": "207",
+        "orgName": "SemanticBits",
+        "orgOid": "sd3456gh-67hj67-67hj-bf51-23we23we23we"
+      },
+      "usedAuthorList": [
+        {
+          "id": "207",
+          "authorName": "SemanticBits",
+          "orgId": "sd3456gh-67hj67-67hj-bf51-23we23we23we"
+        }
+      ],
+      "allAuthorList": null,
+      "allStewardList": null
+    },
+    "qdmVersion": null,
+    "fhirVersion": "4.0.1",
+    "formattedVersion": "Draft v0.0.001",
+    "experimental": true,
+    "populationBasis": "boolean",
+    "editable": false,
+    "calenderYear": false,
+    "deleted": false,
+    "patientBased": true,
+    "cqllibraryName": "MedicationDispenseTest",
+    "fhir": true
+  }
+}
