@@ -74,7 +74,7 @@ const convertPopulations = (matPopulations: any) => {
   return populations;
 };
 
-// convert MAT measure groups to madie measure groups
+// convert MAT measure groups to MADiE measure groups
 const convertMeasureGroups = (measureResourceJson: string): Array<Group> => {
   if (!measureResourceJson) {
     return [];

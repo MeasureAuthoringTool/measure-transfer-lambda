@@ -3,7 +3,7 @@ version = 0.1
 [default.deploy]
 [default.deploy.parameters]
 stack_name = "measure-transfer-lambda"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-a2bac9f2"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-bc2512b5"
 s3_prefix = "measure-transfer-lambda"
 region = "us-east-1"
 confirm_changeset = true

@@ -18,7 +18,7 @@ import { MADiE_SERVICE_URL, MADiE_API_KEY } from "./configs/configs";
  * @returns {Promise} object - string representation of measure json
  *
  */
-export const lambdaHandler = async (event: S3Event): Promise<string> => {
+export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
   console.log("Lambda handler started.....");
   const bucket: string = event.Records[0].s3.bucket.name;
   const key: string = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
@@ -41,17 +41,16 @@ export const lambdaHandler = async (event: S3Event): Promise<string> => {
         madieMeasure,
       );
       // TODO: Success email notification
-      console.log("Response from MADiE service:", JSON.stringify(response));
+      console.log("Saved Measure id: ", response.id);
+      console.log("Lambda execution completed...");
+      return response;
     } catch (error) {
       // TODO: error email notification
-      console.log("Error: ", error);
+      console.log("MADiE Client error: ", error);
+      throw error;
     }
-    console.log("Lambda execution completed...");
-    return bodyContents;
-  } catch (error) {
+  } catch (error: any) {
     console.log("Error: ", error);
-    const message = `Error getting object ${key} from bucket ${bucket}. Make sure they exist and your bucket is in the same region as this function.`;
-    console.log(message);
-    throw new Error(message);
+    throw new Error(error.message);
   }
 };

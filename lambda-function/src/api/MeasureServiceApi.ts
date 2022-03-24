@@ -16,10 +16,10 @@ export class MeasureServiceApi {
         },
       );
       return response.data;
-    } catch (err) {
+    } catch (error) {
       const message = `Failed to transfer the measure over to MADiE.`;
-      console.log(message, err);
-      throw new Error(message);
+      console.log(message, error);
+      throw error;
     }
   }
 }
