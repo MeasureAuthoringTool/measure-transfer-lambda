@@ -8,8 +8,7 @@ import { convertToMadieMeasure } from "./utils/measureConversionUtils";
 import Measure from "./models/Measure";
 import { MeasureServiceApi } from "./api/MeasureServiceApi";
 
-const MADiE_SERVICE_URL = process.env.MADiE_SERVICE_URL || "http://localhost:8080/api";
-const MADiE_API_KEY = process.env.MADiE_API_KEY || "9202c9fa-29ca-410f-8bad-3c5b4b1fba9d";
+import { MADiE_SERVICE_URL, MADiE_API_KEY } from "./configs/configs";
 
 /**
  * Lambda function handler
@@ -40,7 +39,6 @@ export const lambdaHandler = async (event: S3Event): Promise<string> => {
     try {
       const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
         madieMeasure,
-        matMeasure.harpId,
       );
       // TODO: Success email notification
       console.log("Response from MADiE service:", JSON.stringify(response));
