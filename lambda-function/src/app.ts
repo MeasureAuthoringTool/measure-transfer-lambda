@@ -3,6 +3,13 @@ import { S3Event } from "aws-lambda";
 import { streamToString } from "./streamToString";
 import { Readable } from "stream";
 import { s3Client } from "./s3Client.js";
+import MatMeasure from "./models/MatMeasure";
+import { convertToMadieMeasure } from "./utils/measureConversionUtils";
+import Measure from "./models/Measure";
+import { MeasureServiceApi } from "./api/MeasureServiceApi";
+
+const MADiE_SERVICE_URL = process.env.MADiE_SERVICE_URL || "http://localhost:8080/api";
+const MADiE_API_KEY = process.env.MADiE_API_KEY || "9202c9fa-29ca-410f-8bad-3c5b4b1fba9d";
 
 /**
  * Lambda function handler
@@ -27,6 +34,20 @@ export const lambdaHandler = async (event: S3Event): Promise<string> => {
     const { Body } = await s3Client.send(new GetObjectCommand(params));
     const bodyContents = await streamToString(Body as Readable);
     console.log("Contents:", bodyContents);
+
+    const matMeasure: MatMeasure = JSON.parse(bodyContents);
+    const madieMeasure: Measure = convertToMadieMeasure(matMeasure);
+    try {
+      const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
+        madieMeasure,
+        matMeasure.harpId,
+      );
+      // TODO: Success email notification
+      console.log("Response from MADiE service:", JSON.stringify(response));
+    } catch (error) {
+      // TODO: error email notification
+      console.log("Error: ", error);
+    }
     console.log("Lambda execution completed...");
     return bodyContents;
   } catch (error) {
