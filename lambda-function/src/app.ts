@@ -39,6 +39,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     try {
       const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
         madieMeasure,
+        matMeasure.harpId,
       );
       // TODO: Success email notification
       console.log("Saved Measure id: ", response.id);

@@ -4,7 +4,7 @@ import Measure from "../models/Measure";
 export class MeasureServiceApi {
   constructor(private madieMeasureServiceUrl: string, private apiKey: string) {}
 
-  async transferMeasureToMadie(measure: Measure): Promise<Measure> {
+  async transferMeasureToMadie(measure: Measure, harpId: string): Promise<Measure> {
     try {
       const response = await axios.post<Measure>(
         `${this.madieMeasureServiceUrl}/measure-transfer/mat-measures`,
@@ -12,6 +12,7 @@ export class MeasureServiceApi {
         {
           headers: {
             "api-key": this.apiKey,
+            "harp-id": harpId,
           },
         },
       );
