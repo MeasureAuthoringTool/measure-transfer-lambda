@@ -1,5 +1,8 @@
 # measure-transfer-lambda
 
+[![Continuous Integration](https://github.com/MeasureAuthoringTool/measure-transfer-lambda/actions/workflows/ci.yml/badge.svg)](https://github.com/MeasureAuthoringTool/measure-transfer-lambda/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/MeasureAuthoringTool/measure-transfer-lambda/branch/main/graph/badge.svg?token=tLwOcvZYVB)](https://codecov.io/gh/MeasureAuthoringTool/measure-transfer-lambda)
+
 MeasureTransferLambda is an AWS lambda function that is being used to transfer a MAT measure to the MADiE.
 Lambda function reads the measure json file uploaded to S3 bucket(see `./template.yml` AWS SAM template for whole stack) by MAT application and transfers it to MADiE application.
 

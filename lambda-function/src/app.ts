@@ -3,6 +3,12 @@ import { S3Event } from "aws-lambda";
 import { streamToString } from "./streamToString";
 import { Readable } from "stream";
 import { s3Client } from "./s3Client.js";
+import MatMeasure from "./models/MatMeasure";
+import { convertToMadieMeasure } from "./utils/measureConversionUtils";
+import Measure from "./models/Measure";
+import { MeasureServiceApi } from "./api/MeasureServiceApi";
+
+import { MADiE_SERVICE_URL, MADiE_API_KEY } from "./configs/configs";
 
 /**
  * Lambda function handler
@@ -12,7 +18,7 @@ import { s3Client } from "./s3Client.js";
  * @returns {Promise} object - string representation of measure json
  *
  */
-export const lambdaHandler = async (event: S3Event): Promise<string> => {
+export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
   console.log("Lambda handler started.....");
   const bucket: string = event.Records[0].s3.bucket.name;
   const key: string = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
@@ -27,12 +33,25 @@ export const lambdaHandler = async (event: S3Event): Promise<string> => {
     const { Body } = await s3Client.send(new GetObjectCommand(params));
     const bodyContents = await streamToString(Body as Readable);
     console.log("Contents:", bodyContents);
-    console.log("Lambda execution completed...");
-    return bodyContents;
-  } catch (error) {
+
+    const matMeasure: MatMeasure = JSON.parse(bodyContents);
+    const madieMeasure: Measure = convertToMadieMeasure(matMeasure);
+    try {
+      const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
+        madieMeasure,
+        matMeasure.harpId,
+      );
+      // TODO: Success email notification
+      console.log("Saved Measure id: ", response.id);
+      console.log("Lambda execution completed...");
+      return response;
+    } catch (error) {
+      // TODO: error email notification
+      console.log("MADiE Client error: ", error);
+      throw error;
+    }
+  } catch (error: any) {
     console.log("Error: ", error);
-    const message = `Error getting object ${key} from bucket ${bucket}. Make sure they exist and your bucket is in the same region as this function.`;
-    console.log(message);
-    throw new Error(message);
+    throw new Error(error.message);
   }
 };
