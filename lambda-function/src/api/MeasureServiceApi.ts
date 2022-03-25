@@ -17,9 +17,8 @@ export class MeasureServiceApi {
         },
       );
       return response.data;
-    } catch (error) {
-      const message = `Failed to transfer the measure over to MADiE.`;
-      console.log(message, error);
+    } catch (error: any) {
+      console.log(JSON.stringify("Failed to transfer the measure over to MADiE: ", error.response?.data));
       throw error;
     }
   }
