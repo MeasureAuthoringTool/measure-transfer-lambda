@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
 
 jobs:
-  phpunit:
+  build:
     runs-on: ubuntu-latest
     defaults:
       run:
