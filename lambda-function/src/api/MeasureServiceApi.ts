@@ -16,6 +16,7 @@ export class MeasureServiceApi {
           },
         },
       );
+      console.log("Measure service Response: ", response);
       return response.data;
     } catch (error: any) {
       console.log("Failed to transfer the measure over to MADiE: ", JSON.stringify(error.response?.data));
