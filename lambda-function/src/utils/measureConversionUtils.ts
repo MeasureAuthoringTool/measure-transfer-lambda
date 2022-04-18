@@ -1,6 +1,6 @@
-import Measure, { Group, MeasureMetadata } from "../models/Measure";
+import { Measure, Group, MeasureMetadata } from "@madie/madie-models";
 import MatMeasure, { MeasureDetails } from "../models/MatMeasure";
-import { Model } from "../models/Model";
+import { Model } from "@madie/madie-models";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
@@ -137,6 +137,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
 
   const madieMeasure = {
     ...measureProperties,
+    active: true,
     measureMetaData: measureMetaData,
     groups: measureGroups,
     cql: cql,
