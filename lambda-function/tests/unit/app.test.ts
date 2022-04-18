@@ -5,9 +5,8 @@ import { s3Client } from "../../src/s3Client";
 import matMeasure from "./fixtures/measure.json";
 import putEvent from "./fixtures/s3PutEvent.json";
 import axios from "axios";
-import Measure from "../../src/models/Measure";
+import { Measure, Model } from "@madie/madie-models";
 import { convertToMadieMeasure } from "../../src/utils/measureConversionUtils";
-import { Model } from "../../src/models/Model";
 
 jest.mock("axios");
 
