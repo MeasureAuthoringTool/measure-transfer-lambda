@@ -1,6 +1,5 @@
-import { Measure, Group, MeasureMetadata } from "@madie/madie-models";
+import { Group, Measure, MeasureMetadata, Model } from "@madie/madie-models";
 import MatMeasure, { MeasureDetails } from "../models/MatMeasure";
-import { Model } from "@madie/madie-models";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
@@ -111,10 +110,22 @@ const getMeasureLibraryNameAndCql = (matMeasure: MatMeasure): { cqlLibraryName: 
   const cqlBuffer = Buffer.from(cqlContent.data, "base64");
   // convert base64 string to text cql
   const textCql = cqlBuffer.toString("ascii");
+  const matchedCqlWithRegExpression = textCql.match(/^using FHIR.*/gm);
+  let textCqlAfterReplacing = "";
+  if (matchedCqlWithRegExpression) {
+    let replacedTextCql = textCql;
+    textCqlAfterReplacing = matchedCqlWithRegExpression.reduce((matchedCql) => {
+      replacedTextCql = replacedTextCql.replace(
+        matchedCql,
+        matchedCql.replace(/^using FHIR.*/gm, "using QICore version '4.1.0'"),
+      );
+      return replacedTextCql;
+    }, replacedTextCql);
+  }
 
   return {
     cqlLibraryName: mainLibrary.resource.name,
-    cql: textCql,
+    cql: textCqlAfterReplacing || textCql,
   };
 };
 
