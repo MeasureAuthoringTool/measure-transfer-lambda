@@ -109,11 +109,11 @@ const getMeasureLibraryNameAndCql = (matMeasure: MatMeasure): { cqlLibraryName: 
   const cqlBuffer = Buffer.from(cqlContent.data, "base64");
   // convert base64 string to text cql
   const textCql = cqlBuffer.toString("ascii");
-  const textCqlAfterReplacing = textCql.replace(/^using FHIR.*/gm, "using QICore version '4.1.0'");
+  const qiCoreCql = textCql.replace(/^using FHIR.*/gm, "using QICore version '4.1.0'");
 
   return {
     cqlLibraryName: mainLibrary.resource.name,
-    cql: textCqlAfterReplacing || textCql,
+    cql: qiCoreCql,
   };
 };
 
