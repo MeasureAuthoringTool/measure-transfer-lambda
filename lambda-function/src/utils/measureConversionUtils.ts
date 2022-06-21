@@ -89,7 +89,6 @@ const convertMeasureGroups = (measureResourceJson: string): Array<Group> => {
 
     const populations = convertPopulations(group.population);
     madieMeasureGroup.population = populations;
-
     return madieMeasureGroup;
   });
 };
