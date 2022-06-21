@@ -35,6 +35,9 @@ describe("Unit test for lambda handler", () => {
     expect(madieMeasure.cqlLibraryName).toEqual(matMeasure.manageMeasureDetailModel.cqllibraryName);
     expect(madieMeasure.measureScoring).toEqual(matMeasure.manageMeasureDetailModel.measScoring);
     expect(madieMeasure.model).toEqual(Model.QICORE);
+    expect(madieMeasure.createdBy).toEqual(matMeasure.harpId);
+    expect(madieMeasure).toHaveProperty("cql");
+    expect(madieMeasure.cql).toContain("using QICore version '4.1.0'");
   });
 
   it("handles validation errors from MADiE service", async () => {

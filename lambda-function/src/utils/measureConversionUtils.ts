@@ -1,6 +1,5 @@
-import { Measure, Group, MeasureMetadata } from "@madie/madie-models";
+import { Group, Measure, MeasureMetadata, Model } from "@madie/madie-models";
 import MatMeasure, { MeasureDetails } from "../models/MatMeasure";
-import { Model } from "@madie/madie-models";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
@@ -90,7 +89,6 @@ const convertMeasureGroups = (measureResourceJson: string): Array<Group> => {
 
     const populations = convertPopulations(group.population);
     madieMeasureGroup.population = populations;
-
     return madieMeasureGroup;
   });
 };
@@ -111,10 +109,11 @@ const getMeasureLibraryNameAndCql = (matMeasure: MatMeasure): { cqlLibraryName: 
   const cqlBuffer = Buffer.from(cqlContent.data, "base64");
   // convert base64 string to text cql
   const textCql = cqlBuffer.toString("ascii");
+  const qiCoreCql = textCql.replace(/^using FHIR.*/gm, "using QICore version '4.1.0'");
 
   return {
     cqlLibraryName: mainLibrary.resource.name,
-    cql: textCql,
+    cql: qiCoreCql,
   };
 };
 
