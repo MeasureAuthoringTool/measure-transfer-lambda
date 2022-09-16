@@ -1,6 +1,5 @@
 import { Group, Measure, MeasureMetadata, Model, MeasureGroupTypes, Population } from "@madie/madie-models";
 import MatMeasure, { MeasureDetails, MeasureType } from "../models/MatMeasure";
-import { v4 as uuidv4 } from "uuid";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
@@ -15,6 +14,7 @@ const MEASURE_PROPERTY_MAPPINGS = {
   measFromPeriod: "measurementPeriodStart",
   measToPeriod: "measurementPeriodEnd",
   populationBasis: "populationBasis",
+  id: "versionId",
 };
 
 const POPULATION_CODE_MAPPINGS: { [key: string]: string } = {
@@ -201,7 +201,6 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
     lastModifiedBy: matMeasure.harpId,
-    versionId: uuidv4(),
     ecqmTitle: getMeasurePropertyValue("title", measureResource),
     cmsId: getCmsId(measureResource, "identifier"),
   } as Measure;
