@@ -6,7 +6,7 @@ import matMeasure from "./fixtures/measure.json";
 import putEvent from "./fixtures/s3PutEvent.json";
 import axios from "axios";
 import { Measure, Model } from "@madie/madie-models";
-import { convertToMadieMeasure } from "../../src/utils/measureConversionUtils";
+import { convertToMadieMeasure, convertMeasureGroups } from "../../src/utils/measureConversionUtils";
 
 jest.mock("axios");
 
@@ -63,5 +63,19 @@ describe("Unit test for lambda handler", () => {
     } catch (exception) {
       expect(exception.message).toEqual("Connection error");
     }
+  });
+
+  it("throws convert error", async () => {
+    try {
+      convertToMadieMeasure("");
+    } catch (error) {
+      console.log("error = " + error.message);
+      expect(error.message).toBe("Empty Measure");
+    }
+  });
+
+  it("empty groups", async () => {
+    const madieMeasureGroup = convertMeasureGroups("", null, "");
+    expect(madieMeasureGroup.length).toBe(0);
   });
 });
