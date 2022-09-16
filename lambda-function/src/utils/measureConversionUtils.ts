@@ -70,7 +70,7 @@ type MadiePopulationType = {
 };
 
 // convert populations
-const convertPopulations = (matPopulations: any) => {
+const convertPopulation = (matPopulations: any) => {
   const populations = matPopulations.reduce((populationMap: MadiePopulationType, population: any) => {
     const populationCoding = population.code.coding.find((coding: any) => coding.system === POPULATION_CODING_SYSTEM);
     const code: string = POPULATION_CODE_MAPPINGS[populationCoding.code];
@@ -110,7 +110,7 @@ export const convertMeasureGroups = (
       const value = item[1];
       const matPopulations = [];
       matPopulations.push(value);
-      const population = convertPopulations(matPopulations);
+      const population = convertPopulation(matPopulations);
       populations.push(population);
     });
     madieMeasureGroup.populations = populations;
