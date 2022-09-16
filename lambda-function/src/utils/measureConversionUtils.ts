@@ -1,4 +1,12 @@
-import { Group, Measure, MeasureMetadata, Model, MeasureGroupTypes, Population } from "@madie/madie-models";
+import {
+  Group,
+  Measure,
+  MeasureMetadata,
+  Model,
+  MeasureGroupTypes,
+  Population,
+  PopulationType,
+} from "@madie/madie-models";
 import MatMeasure, { MeasureDetails, MeasureType } from "../models/MatMeasure";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
@@ -70,19 +78,14 @@ type MadiePopulationType = {
 };
 
 // convert populations
-const convertPopulation = (matPopulations: any) => {
-  const populations = matPopulations.reduce((populationMap: MadiePopulationType, population: any) => {
-    const populationCoding = population.code.coding.find((coding: any) => coding.system === POPULATION_CODING_SYSTEM);
-    const code: string = POPULATION_CODE_MAPPINGS[populationCoding.code];
-
-    populationMap["id"] = population.id;
-    populationMap["name"] = code;
-    populationMap["definition"] = population.criteria.expression;
-
-    return populationMap;
-  }, {} as MadiePopulationType);
-
-  return populations;
+const convertPopulation = (matPopulation: any) => {
+  const populationCoding = matPopulation.code.coding.find((coding: any) => coding.system === POPULATION_CODING_SYSTEM);
+  const code: string = POPULATION_CODE_MAPPINGS[populationCoding.code];
+  return {
+    id: matPopulation.id,
+    name: getPopulationType(code),
+    definition: matPopulation.criteria.expression,
+  } as Population;
 };
 
 // convert MAT measure groups to MADiE measure groups
@@ -103,15 +106,8 @@ export const convertMeasureGroups = (
       scoring: measureResource.scoring.coding[0].display,
     } as Group;
 
-    //const population = convertPopulations(group.population);
-    const populations: Population[] = [];
-    let result = Object.entries(group.population);
-    result.map((item) => {
-      const value = item[1];
-      const matPopulations = [];
-      matPopulations.push(value);
-      const population = convertPopulation(matPopulations);
-      populations.push(population);
+    const populations = Object.entries(group.population).map((item) => {
+      return convertPopulation(item[1]);
     });
     madieMeasureGroup.populations = populations;
 
@@ -119,6 +115,31 @@ export const convertMeasureGroups = (
     madieMeasureGroup.populationBasis = populationBasis;
     return madieMeasureGroup;
   });
+};
+
+export const getPopulationType = (type: string): PopulationType => {
+  switch (type) {
+    case "initialPopulation":
+      return PopulationType.INITIAL_POPULATION;
+    case "numerator":
+      return PopulationType.NUMERATOR;
+    case "numeratorExclusion":
+      return PopulationType.NUMERATOR_EXCLUSION;
+    case "denominator":
+      return PopulationType.DENOMINATOR;
+    case "denominatorExclusion":
+      return PopulationType.DENOMINATOR_EXCLUSION;
+    case "denominatorException":
+      return PopulationType.DENOMINATOR_EXCEPTION;
+    case "measurePopulation":
+      return PopulationType.MEASURE_POPULATION;
+    case "measurePopulationExclusion":
+      return PopulationType.MEASURE_POPULATION_EXCLUSION;
+    case "measureObservation":
+      return PopulationType.MEASURE_OBSERVATION;
+    default:
+      return PopulationType.INITIAL_POPULATION;
+  }
 };
 
 const getMeasuretypes = (measuretypes: Array<MeasureType>): Array<MeasureGroupTypes> => {
@@ -201,7 +222,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
     lastModifiedBy: matMeasure.harpId,
-    ecqmTitle: getMeasurePropertyValue("title", measureResource),
+    ecqmTitle: measureResource.title,
     cmsId: getCmsId(measureResource, "identifier"),
   } as Measure;
 
@@ -211,7 +232,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
 const getMeasurePropertyValue = (propertyName: string, measureProperties: Object): string => {
   let propertyValue = "";
   if (measureProperties) {
-    Object.entries(measureProperties).map(([key, value]) => {
+    Object.entries(measureProperties).forEach(([key, value]) => {
       if (key === propertyName) {
         propertyValue = value.toString();
       }
@@ -224,7 +245,7 @@ const getCmsId = (measureResource: Object, property: string) => {
   const cmsIdObj = getMatMeasureValue(measureResource, property);
   let cmsId = "";
   if (cmsIdObj !== null) {
-    Object.entries(cmsIdObj).map((item) => {
+    Object.entries(cmsIdObj).forEach((item) => {
       const identifier = item[1] as Object;
       const objStr = JSON.stringify(item[1]);
       if (identifier !== null && objStr.includes("ecqm") && objStr.includes("Identifier")) {
@@ -237,7 +258,7 @@ const getCmsId = (measureResource: Object, property: string) => {
 
 const getMatMeasureValue = (measureResource: Object, property: string) => {
   let matMeasureValue = null;
-  Object.entries(measureResource).map((item) => {
+  Object.entries(measureResource).forEach((item) => {
     if (item[0] === property) {
       matMeasureValue = item[1];
     }
