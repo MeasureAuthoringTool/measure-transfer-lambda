@@ -23,6 +23,7 @@ const MEASURE_PROPERTY_MAPPINGS = {
   measToPeriod: "measurementPeriodEnd",
   populationBasis: "populationBasis",
   id: "versionId",
+  shortName: "ecqmTitle",
 };
 
 const POPULATION_CODE_MAPPINGS: { [key: string]: string } = {
@@ -222,7 +223,6 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
     lastModifiedBy: matMeasure.harpId,
-    ecqmTitle: measureResource.title,
     cmsId: getCmsId(measureResource, "identifier"),
   } as Measure;
 
