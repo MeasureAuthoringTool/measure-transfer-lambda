@@ -50,7 +50,7 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
       }
       if ((matProperty === "measFromPeriod" || matProperty === "measToPeriod") && value) {
         const date = new Date(value);
-        value = date.toISOString().split("T")[0];
+        value = date.toISOString();
       }
       return [madieProperty, value];
     })
