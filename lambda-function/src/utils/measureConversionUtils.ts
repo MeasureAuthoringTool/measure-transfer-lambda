@@ -8,6 +8,7 @@ import {
   PopulationType,
 } from "@madie/madie-models";
 import MatMeasure, { MeasureDetails, MeasureType } from "../models/MatMeasure";
+import { getPopulationsForScoring } from "./populationHelper";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
@@ -110,7 +111,9 @@ export const convertMeasureGroups = (
     const populations = Object.entries(group.population).map((item) => {
       return convertPopulation(item[1]);
     });
-    madieMeasureGroup.populations = populations;
+    const allPopulations = getPopulationsForScoring(madieMeasureGroup.scoring as string);
+    const unselectedPopulations: Population[] = getUnselectedPopulations(allPopulations, populations);
+    madieMeasureGroup.populations = [...populations, ...unselectedPopulations];
 
     madieMeasureGroup.measureGroupTypes = getMeasuretypes(measuretypes);
     madieMeasureGroup.populationBasis = populationBasis;
@@ -264,4 +267,24 @@ const getMatMeasureValue = (measureResource: Object, property: string) => {
     }
   });
   return matMeasureValue;
+};
+
+const getUnselectedPopulations = (allPopulations: Population[], selectedPopulations: Population[]): Population[] => {
+  const unselectedPopulations: Population[] = [];
+  allPopulations.forEach((population) => {
+    if (!isSelected(population, selectedPopulations)) {
+      unselectedPopulations.push(population);
+    }
+  });
+  return unselectedPopulations;
+};
+
+const isSelected = (population: Population, selectedPopulations: Population[]): boolean => {
+  let selected = false;
+  selectedPopulations.forEach((pop) => {
+    if (pop.name === population.name) {
+      selected = true;
+    }
+  });
+  return selected;
 };
