@@ -50,8 +50,8 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
         value = Model.QICORE;
       }
       if ((matProperty === "measFromPeriod" || matProperty === "measToPeriod") && value) {
-        const [month, day, year] =  value.split("/");
-        const date = new Date(year, month-1, day, 1, 0, 0);
+        const [month, day, year] = value.split("/");
+        const date = new Date(year, month - 1, day, 1, 0, 0);
         value = date.toISOString();
       }
       return [madieProperty, value];
