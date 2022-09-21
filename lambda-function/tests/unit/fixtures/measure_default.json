@@ -1,146 +1,145 @@
 {
-    "emailId": "john.doe@exploaders.com",
-    "harpId": "cecilia.liu@semanticbits.com",
-    "manageMeasureDetailModel": {
-      "id": "t634er34er34er34er34er",
-      "measureName": "MedicationDispenseTest",
-      "measureModel": "FHIR",
-      "shortName": "MedicationDispenseTestShortName",
-      "versionNumber": "0.000",
-      "revisionNumber": "1",
-      "measureId": null,
-      "groupName": null,
-      "groupId": "t3rf574g56hgroup-14sd-4b7c-89t4-23we23we23we",
-      "finalizedDate": null,
-      "measFromPeriod": "01/01/2021",
-      "measToPeriod": "12/31/2021",
-      "measScoring": "Default",
-      "stewardValue": "SemanticBits",
-      "endorseByNQF": false,
-      "nqfId": null,
-      "description": "MedicationDispenseTest measure For Bonnie",
-      "copyright": "Test",
-      "clinicalRecomms": null,
-      "definitions": null,
-      "guidance": null,
-      "transmissionFormat": null,
-      "rationale": null,
-      "improvNotations": "increase",
-      "stratification": null,
-      "referencesList": [],
-      "authorSelectedList": [
+  "emailId": "john.doe@exploaders.com",
+  "harpId": "cecilia.liu@semanticbits.com",
+  "manageMeasureDetailModel": {
+    "id": "t634er34er34er34er34er",
+    "measureName": "MedicationDispenseTest",
+    "measureModel": "FHIR",
+    "shortName": "MedicationDispenseTestShortName",
+    "versionNumber": "0.000",
+    "revisionNumber": "1",
+    "measureId": null,
+    "groupName": null,
+    "groupId": "t3rf574g56hgroup-14sd-4b7c-89t4-23we23we23we",
+    "finalizedDate": null,
+    "measFromPeriod": "01/01/2021",
+    "measToPeriod": "12/31/2021",
+    "measScoring": "Default",
+    "stewardValue": "SemanticBits",
+    "endorseByNQF": false,
+    "nqfId": null,
+    "description": "MedicationDispenseTest measure For Bonnie",
+    "copyright": "Test",
+    "clinicalRecomms": null,
+    "definitions": null,
+    "guidance": null,
+    "transmissionFormat": null,
+    "rationale": null,
+    "improvNotations": "increase",
+    "stratification": null,
+    "referencesList": [],
+    "authorSelectedList": [
+      {
+        "id": "1.22.333.4.5.6.777777",
+        "authorName": "Able Health",
+        "orgId": "1.22.333.4.5.6.777777"
+      },
+      {
+        "id": "02c84f54-2n4h56ki6nru-aa1bb444b333b",
+        "authorName": "SemanticBits",
+        "orgId": "02c84f54-2n4h56ki6nru-aa1ab444b333b"
+      }
+    ],
+    "stewardSelectedList": null,
+    "measureTypeSelectedList": [
+      {
+        "id": "6",
+        "description": "Process",
+        "abbrName": "PROCESS"
+      },
+      {
+        "id": "5",
+        "description": "Outcome",
+        "abbrName": "OUTCOME"
+      },
+      {
+        "id": "4",
+        "description": "Patient Reported Outcome",
+        "abbrName": "PATIENT_REPORTED_OUTCOME"
+      },
+      {
+        "id": "3",
+        "description": "Structure",
+        "abbrName": "STRUCTURE"
+      },
+      {
+        "id": "2",
+        "description": "Default",
+        "abbrName": "DEFAULT"
+      }
+    ],
+    "qdsSelectedList": null,
+    "componentMeasuresSelectedList": null,
+    "toCompareAuthor": null,
+    "toCompareMeasure": null,
+    "toCompareComponentMeasures": null,
+    "draft": true,
+    "measureSetId": "12we34rtwt-45rt-45rt-ab2cd2",
+    "valueSetDate": null,
+    "supplementalData": null,
+    "disclaimer": "Test Disclaimer",
+    "riskAdjustment": null,
+    "rateAggregation": null,
+    "initialPop": null,
+    "denominator": null,
+    "denominatorExclusions": null,
+    "numerator": null,
+    "numeratorExclusions": null,
+    "denominatorExceptions": null,
+    "measurePopulation": null,
+    "measureObservations": null,
+    "eMeasureId": 0,
+    "orgVersionNumber": "0.0.001",
+    "qltyMeasureSetUuid": "aae63d9b-12d3-1a23-1234-34509c552542",
+    "stewardId": "219",
+    "scoringAbbr": "DEFAULT",
+    "periodModel": {
+      "uuid": "3ed8c3da-1632-4678-b55d-ab4cd5ef3gh45",
+      "startDate": "12/31/2020",
+      "stopDate": "12/30/2021",
+      "calenderYear": false
+    },
+    "endorsement": null,
+    "endorsementId": null,
+    "nqfModel": {
+      "root": "2.16.840.1.113883.3.560.1",
+      "extension": null
+    },
+    "measureOwnerId": "abc34mdf45rfg56m676mf567fds",
+    "measurePopulationExclusions": "",
+    "measureDetailResult": {
+      "usedSteward": {
+        "id": "222",
+        "orgName": "SemanticMD, Inc",
+        "orgOid": "e9604340-a69f-11ea-bb37-0242ac130002"
+      },
+      "usedAuthorList": [
         {
-          "id": "1.22.333.4.5.6.777777",
+          "id": "111",
           "authorName": "Able Health",
           "orgId": "1.22.333.4.5.6.777777"
         },
         {
-          "id": "02c84f54-2n4h56ki6nru-aa1bb444b333b",
+          "id": "207",
           "authorName": "SemanticBits",
-          "orgId": "02c84f54-2n4h56ki6nru-aa1ab444b333b"
+          "orgId": "sd3456gh-67hj67-67hj-bf51-23we23we23we"
         }
       ],
-      "stewardSelectedList": null,
-      "measureTypeSelectedList": [
-        {
-          "id": "6",
-          "description": "Process",
-          "abbrName": "PROCESS"
-        },
-        {
-          "id": "5",
-          "description": "Outcome",
-          "abbrName": "OUTCOME"
-        },
-        {
-          "id": "4",
-          "description": "Patient Reported Outcome",
-          "abbrName": "PATIENT_REPORTED_OUTCOME"
-        },
-        {
-          "id": "3",
-          "description": "Structure",
-          "abbrName": "STRUCTURE"
-        },
-        {
-          "id": "2",
-          "description": "Default",
-          "abbrName": "DEFAULT"
-        }
-      ],
-      "qdsSelectedList": null,
-      "componentMeasuresSelectedList": null,
-      "toCompareAuthor": null,
-      "toCompareMeasure": null,
-      "toCompareComponentMeasures": null,
-      "draft": true,
-      "measureSetId": "12we34rtwt-45rt-45rt-ab2cd2",
-      "valueSetDate": null,
-      "supplementalData": null,
-      "disclaimer": "Test Disclaimer",
-      "riskAdjustment": null,
-      "rateAggregation": null,
-      "initialPop": null,
-      "denominator": null,
-      "denominatorExclusions": null,
-      "numerator": null,
-      "numeratorExclusions": null,
-      "denominatorExceptions": null,
-      "measurePopulation": null,
-      "measureObservations": null,
-      "eMeasureId": 0,
-      "orgVersionNumber": "0.0.001",
-      "qltyMeasureSetUuid": "aae63d9b-12d3-1a23-1234-34509c552542",
-      "stewardId": "219",
-      "scoringAbbr": "DEFAULT",
-      "periodModel": {
-        "uuid": "3ed8c3da-1632-4678-b55d-ab4cd5ef3gh45",
-        "startDate": "12/31/2020",
-        "stopDate": "12/30/2021",
-        "calenderYear": false
-      },
-      "endorsement": null,
-      "endorsementId": null,
-      "nqfModel": {
-        "root": "2.16.840.1.113883.3.560.1",
-        "extension": null
-      },
-      "measureOwnerId": "abc34mdf45rfg56m676mf567fds",
-      "measurePopulationExclusions": "",
-      "measureDetailResult": {
-        "usedSteward": {
-          "id": "222",
-          "orgName": "SemanticMD, Inc",
-          "orgOid": "e9604340-a69f-11ea-bb37-0242ac130002"
-        },
-        "usedAuthorList": [
-          {
-            "id": "111",
-            "authorName": "Able Health",
-            "orgId": "1.22.333.4.5.6.777777"
-          },
-          {
-            "id": "207",
-            "authorName": "SemanticBits",
-            "orgId": "sd3456gh-67hj67-67hj-bf51-23we23we23we"
-          }
-        ],
-        "allAuthorList": null,
-        "allStewardList": null
-      },
-      "qdmVersion": null,
-      "fhirVersion": "4.0.1",
-      "formattedVersion": "Draft v0.0.001",
-      "experimental": true,
-      "populationBasis": "boolean",
-      "fhir": true,
-      "editable": false,
-      "calenderYear": false,
-      "deleted": false,
-      "patientBased": true,
-      "cqllibraryName": "MedicationDispenseTest"
+      "allAuthorList": null,
+      "allStewardList": null
     },
-    "fhirMeasureResourceJson": "{\n  \"resourceType\": \"Measure\",\n  \"id\": \"2c92808476b0d3180176bab5a60a01f1\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2020-12-31T21:57:41.000+00:00\",\n    \"source\": \"#eAJ6acy6VNLHrpv5\",\n    \"profile\": [\n      \"http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cohort-measure-cqfm\"\n    ]\n  },\n  \"language\": \"en\",\n  \"extension\": [\n    {\n      \"url\": \"http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-populationBasis\",\n      \"valueCode\": \"boolean\"\n    }\n  ],\n  \"url\": \"http://ecqi.healthit.gov/ecqms/Measure/MedicationDispenseTest\",\n  \"identifier\": [\n    {\n      \"use\": \"official\",\n      \"system\": \"http://hl7.org/fhir/cqi/ecqm/Measure/Identifier/guid\",\n      \"value\": \"aae63d9b-12d3-1a23-1234-34509c552542\"\n    }\n  ],\n  \"version\": \"0.0.001\",\n  \"name\": \"MedicationDispenseTest\",\n  \"title\": \"MedicationDispenseTest\",\n  \"status\": \"draft\",\n  \"experimental\": true,\n  \"publisher\": \"SemanticBits\",\n  \"contact\": [\n    {\n      \"telecom\": [\n        {\n          \"system\": \"url\",\n          \"value\": \"https://cms.gov\"\n        }\n      ]\n    }\n  ],\n  \"description\": \"MedicationDispenseTest  measure For Bonnie\",\n  \"purpose\": \"Unknown\",\n  \"effectivePeriod\": {\n    \"start\": \"2021-01-01\",\n    \"end\": \"2021-12-31\"\n  },\n  \"library\": [\n    \"http://ecqi.healthit.gov/ecqms/Library/MedicationDispenseTest\"\n  ],\n  \"scoring\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/measure-scoring\",\n        \"code\": \"default\",\n        \"display\": \"Default\"\n      }\n    ]\n  },\n  \"type\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://hl7.org/fhir/measure-type\",\n          \"code\": \"process\"\n        }\n      ]\n    }\n  ],\n  \"improvementNotation\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/measure-improvement-notation\",\n        \"code\": \"increase\"\n      }\n    ]\n  },\n  \"group\": [\n    {\n      \"population\": [\n        {\n          \"id\": \"C62E1EBD-AD4C-4B29-808C-1EF375E76876\",\n          \"code\": {\n            \"coding\": [\n              {\n                \"system\": \"http://terminology.hl7.org/CodeSystem/measure-population\",\n                \"code\": \"initial-population\",\n                \"display\": \"Initial Population\"\n              }\n            ]\n          },\n          \"criteria\": {\n            \"language\": \"text/cql.identifier\",\n            \"expression\": \"Initial Population\"\n          }\n        },\n    {\n          \"id\": \"C62E1EBD-AD4C-4B29-808C-1EF375E76776\",\n          \"code\": {\n            \"coding\": [\n              {\n                \"system\": \"http://terminology.hl7.org/CodeSystem/measure-population\",\n                \"code\": \"initial-population\",\n                \"display\": \"Initial Population\"\n              }\n            ]\n          },\n          \"criteria\": {\n            \"language\": \"text/cql.identifier\",\n            \"expression\": \"Initial Population\"\n          }\n        }              ]\n    },\n  {\n      \"population\": [\n        {\n          \"id\": \"group2-population1\",\n          \"code\": {\n            \"coding\": [\n              {\n                \"system\": \"http://terminology.hl7.org/CodeSystem/measure-population\",\n                \"code\": \"initial-population\",\n                \"display\": \"Initial Population\"\n              }\n            ]\n          },\n          \"criteria\": {\n            \"language\": \"text/cql.identifier\",\n            \"expression\": \"Initial Population\"\n          }\n        },\n    {\n          \"id\": \"group2-population2\",\n          \"code\": {\n            \"coding\": [\n              {\n                \"system\": \"http://terminology.hl7.org/CodeSystem/measure-population\",\n                \"code\": \"initial-population\",\n                \"display\": \"Initial Population\"\n              }\n            ]\n          },\n          \"criteria\": {\n            \"language\": \"text/cql.identifier\",\n            \"expression\": \"Initial Population\"\n          }\n        }              ]\n    }\n  ],\n  \"supplementalData\": [\n    {\n      \"id\": \"1f7bcdf3-76f6-4617-af5a-06d720ef4d3c\",\n      \"usage\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/measure-data-usage\",\n              \"code\": \"supplemental-data\"\n            }\n          ]\n        }\n      ],\n      \"criteria\": {\n        \"language\": \"text/cql.identifier\",\n        \"expression\": \"SDE Ethnicity\"\n      }\n    },\n    {\n      \"id\": \"ce61b1f2-3279-4d9e-9aa6-17018e3b8cdc\",\n      \"usage\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/measure-data-usage\",\n              \"code\": \"supplemental-data\"\n            }\n          ]\n        }\n      ],\n      \"criteria\": {\n        \"language\": \"text/cql.identifier\",\n        \"expression\": \"SDE Payer\"\n      }\n    },\n    {\n      \"id\": \"3dbd84ad-8e58-4358-bc88-765307e4a19b\",\n      \"usage\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/measure-data-usage\",\n              \"code\": \"supplemental-data\"\n            }\n          ]\n        }\n      ],\n      \"criteria\": {\n        \"language\": \"text/cql.identifier\",\n        \"expression\": \"SDE Race\"\n      }\n    },\n    {\n      \"id\": \"a9f6f2f5-d83c-431b-8fe1-82c1f62473bb\",\n      \"usage\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/measure-data-usage\",\n              \"code\": \"supplemental-data\"\n            }\n          ]\n        }\n      ],\n      \"criteria\": {\n        \"language\": \"text/cql.identifier\",\n        \"expression\": \"SDE Sex\"\n      }\n    }\n  ]\n}",
-    "fhirLibraryResourcesJson": "{\n  \"resourceType\": \"Bundle\",\n  \"type\": \"transaction\",\n  \"entry\": [\n    {\n      \"resource\": {\n        \"resourceType\": \"Library\",\n        \"id\": \"2c92808473180176bace6d1234565789\",\n        \"meta\": {\n          \"versionId\": \"1\",\n          \"lastUpdated\": \"2020-12-31T21:57:41.000+00:00\",\n          \"source\": \"#ICEov3rj9o9IFLff\",\n          \"profile\": [\n            \"http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/computable-library-cqfm\"\n          ]\n        },\n        \"language\": \"en\",\n        \"url\": \"http://ecqi.healthit.gov/ecqms/Library/MedicationDispenseTest\",\n        \"version\": \"0.0.001\",\n        \"name\": \"MedicationDispenseTest\",\n        \"status\": \"active\",\n        \"experimental\": false,\n        \"type\": {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/library-type\",\n              \"code\": \"logic-library\"\n            }\n          ]\n        },\n        \"date\": \"2020-12-31T21:57:40+00:00\",\n        \"publisher\": \"SemanticBits\",\n        \"description\": \"MedicationDispenseTest\",\n        \"relatedArtifact\": [\n          {\n            \"type\": \"depends-on\",\n            \"url\": \"http://cts.nlm.nih.gov/fhir/ValueSet/2.16.840.1.113883.3.464.1003.196.11.1517\"\n          },\n          {\n            \"type\": \"depends-on\",\n            \"url\": \"http://ecqi.healthit.gov/ecqms/Library/FHIRHelpers\"\n          },\n          {\n            \"type\": \"depends-on\",\n            \"url\": \"http://ecqi.healthit.gov/ecqms/Library/MATGlobalCommonFunctionsFHIR4\"\n          },\n          {\n            \"type\": \"depends-on\",\n            \"url\": \"http://ecqi.healthit.gov/ecqms/Library/SupplementalDataElementsFHIR4\"\n          }\n        ],\n        \"dataRequirement\": [\n          {\n            \"type\": \"MedicationDispense\",\n            \"codeFilter\": [\n              {\n                \"path\": \"code\",\n                \"valueSet\": \"http://cts.nlm.nih.gov/fhir/ValueSet/2.16.840.1.113883.3.464.1003.196.11.1517\"\n              }\n            ]\n          }\n        ],\n        \"content\": [\n          {\n            \"contentType\": \"text/cql\",\n            \"data\": \"bGlicmFyeSBNZWRpY2F0aW9uRGlzcGVuc2VUZXN0IHZlcnNpb24gJzAuMC4wMDEnCgp1c2luZyBGSElSIHZlcnNpb24gJzQuMC4xJwoKaW5jbHVkZSBGSElSSGVscGVycyB2ZXJzaW9uICc0LjAuMDAxJyBjYWxsZWQgRkhJUkhlbHBlcnMKaW5jbHVkZSBTdXBwbGVtZW50YWxEYXRhRWxlbWVudHNGSElSNCB2ZXJzaW9uICcyLjAuMDAwJyBjYWxsZWQgU0RFCmluY2x1ZGUgTUFUR2xvYmFsQ29tbW9uRnVuY3Rpb25zRkhJUjQgdmVyc2lvbiAnNS4wLjAwMCcgY2FsbGVkIEdsb2JhbAoKdmFsdWVzZXQgIkRlbWVudGlhIE1lZGljYXRpb25zIjogJ2h0dHA6Ly9jdHMubmxtLm5paC5nb3YvZmhpci9WYWx1ZVNldC8yLjE2Ljg0MC4xLjExMzg4My4zLjQ2NC4xMDAzLjE5Ni4xMS4xNTE3JyAKCnBhcmFtZXRlciAiTWVhc3VyZW1lbnQgUGVyaW9kIiBJbnRlcnZhbDxEYXRlVGltZT4KCmNvbnRleHQgUGF0aWVudAoKZGVmaW5lICJTREUgRXRobmljaXR5IjoKICBTREUuIlNERSBFdGhuaWNpdHkiCgpkZWZpbmUgIlNERSBQYXllciI6CiAgU0RFLiJTREUgUGF5ZXIiCgpkZWZpbmUgIlNERSBSYWNlIjoKICBTREUuIlNERSBSYWNlIgoKZGVmaW5lICJTREUgU2V4IjoKICBTREUuIlNERSBTZXgiCgpkZWZpbmUgIkRlbWVudGlhIE1lZGljYXRpb25zIERpc3BlbnNlZCI6CiAgW01lZGljYXRpb25EaXNwZW5zZTogIkRlbWVudGlhIE1lZGljYXRpb25zIl0gTWVkaWNhdGlvbkRpc3BlbnNlCiAgICAgICAgICAgIHdoZXJlIE1lZGljYXRpb25EaXNwZW5zZS5zdGF0dXMgaW4geyAnYWN0aXZlJywgJ2NvbXBsZXRlZCcsICdvbi1ob2xkJyB9CgpkZWZpbmUgIkluaXRpYWwgUG9wdWxhdGlvbiI6CiAgZXhpc3RzKCJEZW1lbnRpYSBNZWRpY2F0aW9ucyBEaXNwZW5zZWQiKQoK\"\n          },\n          {\n            \"contentType\": \"application/elm+xml\",\n            \"data\": \"fake elm xml\"},\n          {\n            \"contentType\": \"application/elm+json\",\n            \"data\": \"fake elm json\"\n          }\n        ]\n      },\n      \"request\": {\n        \"method\": \"PUT\",\n        \"url\": \"Library/2c92808473180176bace6d1234565789\"\n  }\n  }\n  ]\n}"
-  }
-  
+    "qdmVersion": null,
+    "fhirVersion": "4.0.1",
+    "formattedVersion": "Draft v0.0.001",
+    "experimental": true,
+    "populationBasis": "boolean",
+    "fhir": true,
+    "editable": false,
+    "calenderYear": false,
+    "deleted": false,
+    "patientBased": true,
+    "cqllibraryName": "MedicationDispenseTest"
+  },
+  "fhirMeasureResourceJson": "{\n  \"resourceType\": \"Measure\",\n  \"id\": \"2c92808476b0d3180176bab5a60a01f1\",\n  \"meta\": {\n    \"versionId\": \"1\",\n    \"lastUpdated\": \"2020-12-31T21:57:41.000+00:00\",\n    \"source\": \"#eAJ6acy6VNLHrpv5\",\n    \"profile\": [\n      \"http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cohort-measure-cqfm\"\n    ]\n  },\n  \"language\": \"en\",\n  \"extension\": [\n    {\n      \"url\": \"http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-populationBasis\",\n      \"valueCode\": \"boolean\"\n    }\n  ],\n  \"url\": \"http://ecqi.healthit.gov/ecqms/Measure/MedicationDispenseTest\",\n  \"identifier\": [\n    {\n      \"use\": \"official\",\n      \"system\": \"http://hl7.org/fhir/cqi/ecqm/Measure/Identifier/guid\",\n      \"value\": \"aae63d9b-12d3-1a23-1234-34509c552542\"\n    }\n  ],\n  \"version\": \"0.0.001\",\n  \"name\": \"MedicationDispenseTest\",\n  \"title\": \"MedicationDispenseTest\",\n  \"status\": \"draft\",\n  \"experimental\": true,\n  \"publisher\": \"SemanticBits\",\n  \"contact\": [\n    {\n      \"telecom\": [\n        {\n          \"system\": \"url\",\n          \"value\": \"https://cms.gov\"\n        }\n      ]\n    }\n  ],\n  \"description\": \"MedicationDispenseTest  measure For Bonnie\",\n  \"purpose\": \"Unknown\",\n  \"effectivePeriod\": {\n    \"start\": \"2021-01-01\",\n    \"end\": \"2021-12-31\"\n  },\n  \"library\": [\n    \"http://ecqi.healthit.gov/ecqms/Library/MedicationDispenseTest\"\n  ],\n  \"scoring\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/measure-scoring\",\n        \"code\": \"default\",\n        \"display\": \"Default\"\n      }\n    ]\n  },\n  \"type\": [\n    {\n      \"coding\": [\n        {\n          \"system\": \"http://hl7.org/fhir/measure-type\",\n          \"code\": \"process\"\n        }\n      ]\n    }\n  ],\n  \"improvementNotation\": {\n    \"coding\": [\n      {\n        \"system\": \"http://terminology.hl7.org/CodeSystem/measure-improvement-notation\",\n        \"code\": \"increase\"\n      }\n    ]\n  },\n  \"group\": [\n    {\n      \"population\": [\n        {\n          \"id\": \"C62E1EBD-AD4C-4B29-808C-1EF375E76876\",\n          \"code\": {\n            \"coding\": [\n              {\n                \"system\": \"http://terminology.hl7.org/CodeSystem/measure-population\",\n                \"code\": \"initial-population\",\n                \"display\": \"Initial Population\"\n              }\n            ]\n          },\n          \"criteria\": {\n            \"language\": \"text/cql.identifier\",\n            \"expression\": \"Initial Population\"\n          }\n        },\n    {\n          \"id\": \"C62E1EBD-AD4C-4B29-808C-1EF375E76776\",\n          \"code\": {\n            \"coding\": [\n              {\n                \"system\": \"http://terminology.hl7.org/CodeSystem/measure-population\",\n                \"code\": \"initial-population\",\n                \"display\": \"Initial Population\"\n              }\n            ]\n          },\n          \"criteria\": {\n            \"language\": \"text/cql.identifier\",\n            \"expression\": \"Initial Population\"\n          }\n        }              ]\n    },\n  {\n      \"population\": [\n        {\n          \"id\": \"group2-population1\",\n          \"code\": {\n            \"coding\": [\n              {\n                \"system\": \"http://terminology.hl7.org/CodeSystem/measure-population\",\n                \"code\": \"initial-population\",\n                \"display\": \"Initial Population\"\n              }\n            ]\n          },\n          \"criteria\": {\n            \"language\": \"text/cql.identifier\",\n            \"expression\": \"Initial Population\"\n          }\n        },\n    {\n          \"id\": \"group2-population2\",\n          \"code\": {\n            \"coding\": [\n              {\n                \"system\": \"http://terminology.hl7.org/CodeSystem/measure-population\",\n                \"code\": \"initial-population\",\n                \"display\": \"Initial Population\"\n              }\n            ]\n          },\n          \"criteria\": {\n            \"language\": \"text/cql.identifier\",\n            \"expression\": \"Initial Population\"\n          }\n        }              ]\n    }\n  ],\n  \"supplementalData\": [\n    {\n      \"id\": \"1f7bcdf3-76f6-4617-af5a-06d720ef4d3c\",\n      \"usage\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/measure-data-usage\",\n              \"code\": \"supplemental-data\"\n            }\n          ]\n        }\n      ],\n      \"criteria\": {\n        \"language\": \"text/cql.identifier\",\n        \"expression\": \"SDE Ethnicity\"\n      }\n    },\n    {\n      \"id\": \"ce61b1f2-3279-4d9e-9aa6-17018e3b8cdc\",\n      \"usage\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/measure-data-usage\",\n              \"code\": \"supplemental-data\"\n            }\n          ]\n        }\n      ],\n      \"criteria\": {\n        \"language\": \"text/cql.identifier\",\n        \"expression\": \"SDE Payer\"\n      }\n    },\n    {\n      \"id\": \"3dbd84ad-8e58-4358-bc88-765307e4a19b\",\n      \"usage\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/measure-data-usage\",\n              \"code\": \"supplemental-data\"\n            }\n          ]\n        }\n      ],\n      \"criteria\": {\n        \"language\": \"text/cql.identifier\",\n        \"expression\": \"SDE Race\"\n      }\n    },\n    {\n      \"id\": \"a9f6f2f5-d83c-431b-8fe1-82c1f62473bb\",\n      \"usage\": [\n        {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/measure-data-usage\",\n              \"code\": \"supplemental-data\"\n            }\n          ]\n        }\n      ],\n      \"criteria\": {\n        \"language\": \"text/cql.identifier\",\n        \"expression\": \"SDE Sex\"\n      }\n    }\n  ]\n}",
+  "fhirLibraryResourcesJson": "{\n  \"resourceType\": \"Bundle\",\n  \"type\": \"transaction\",\n  \"entry\": [\n    {\n      \"resource\": {\n        \"resourceType\": \"Library\",\n        \"id\": \"2c92808473180176bace6d1234565789\",\n        \"meta\": {\n          \"versionId\": \"1\",\n          \"lastUpdated\": \"2020-12-31T21:57:41.000+00:00\",\n          \"source\": \"#ICEov3rj9o9IFLff\",\n          \"profile\": [\n            \"http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/computable-library-cqfm\"\n          ]\n        },\n        \"language\": \"en\",\n        \"url\": \"http://ecqi.healthit.gov/ecqms/Library/MedicationDispenseTest\",\n        \"version\": \"0.0.001\",\n        \"name\": \"MedicationDispenseTest\",\n        \"status\": \"active\",\n        \"experimental\": false,\n        \"type\": {\n          \"coding\": [\n            {\n              \"system\": \"http://terminology.hl7.org/CodeSystem/library-type\",\n              \"code\": \"logic-library\"\n            }\n          ]\n        },\n        \"date\": \"2020-12-31T21:57:40+00:00\",\n        \"publisher\": \"SemanticBits\",\n        \"description\": \"MedicationDispenseTest\",\n        \"relatedArtifact\": [\n          {\n            \"type\": \"depends-on\",\n            \"url\": \"http://cts.nlm.nih.gov/fhir/ValueSet/2.16.840.1.113883.3.464.1003.196.11.1517\"\n          },\n          {\n            \"type\": \"depends-on\",\n            \"url\": \"http://ecqi.healthit.gov/ecqms/Library/FHIRHelpers\"\n          },\n          {\n            \"type\": \"depends-on\",\n            \"url\": \"http://ecqi.healthit.gov/ecqms/Library/MATGlobalCommonFunctionsFHIR4\"\n          },\n          {\n            \"type\": \"depends-on\",\n            \"url\": \"http://ecqi.healthit.gov/ecqms/Library/SupplementalDataElementsFHIR4\"\n          }\n        ],\n        \"dataRequirement\": [\n          {\n            \"type\": \"MedicationDispense\",\n            \"codeFilter\": [\n              {\n                \"path\": \"code\",\n                \"valueSet\": \"http://cts.nlm.nih.gov/fhir/ValueSet/2.16.840.1.113883.3.464.1003.196.11.1517\"\n              }\n            ]\n          }\n        ],\n        \"content\": [\n          {\n            \"contentType\": \"text/cql\",\n            \"data\": \"bGlicmFyeSBNZWRpY2F0aW9uRGlzcGVuc2VUZXN0IHZlcnNpb24gJzAuMC4wMDEnCgp1c2luZyBGSElSIHZlcnNpb24gJzQuMC4xJwoKaW5jbHVkZSBGSElSSGVscGVycyB2ZXJzaW9uICc0LjAuMDAxJyBjYWxsZWQgRkhJUkhlbHBlcnMKaW5jbHVkZSBTdXBwbGVtZW50YWxEYXRhRWxlbWVudHNGSElSNCB2ZXJzaW9uICcyLjAuMDAwJyBjYWxsZWQgU0RFCmluY2x1ZGUgTUFUR2xvYmFsQ29tbW9uRnVuY3Rpb25zRkhJUjQgdmVyc2lvbiAnNS4wLjAwMCcgY2FsbGVkIEdsb2JhbAoKdmFsdWVzZXQgIkRlbWVudGlhIE1lZGljYXRpb25zIjogJ2h0dHA6Ly9jdHMubmxtLm5paC5nb3YvZmhpci9WYWx1ZVNldC8yLjE2Ljg0MC4xLjExMzg4My4zLjQ2NC4xMDAzLjE5Ni4xMS4xNTE3JyAKCnBhcmFtZXRlciAiTWVhc3VyZW1lbnQgUGVyaW9kIiBJbnRlcnZhbDxEYXRlVGltZT4KCmNvbnRleHQgUGF0aWVudAoKZGVmaW5lICJTREUgRXRobmljaXR5IjoKICBTREUuIlNERSBFdGhuaWNpdHkiCgpkZWZpbmUgIlNERSBQYXllciI6CiAgU0RFLiJTREUgUGF5ZXIiCgpkZWZpbmUgIlNERSBSYWNlIjoKICBTREUuIlNERSBSYWNlIgoKZGVmaW5lICJTREUgU2V4IjoKICBTREUuIlNERSBTZXgiCgpkZWZpbmUgIkRlbWVudGlhIE1lZGljYXRpb25zIERpc3BlbnNlZCI6CiAgW01lZGljYXRpb25EaXNwZW5zZTogIkRlbWVudGlhIE1lZGljYXRpb25zIl0gTWVkaWNhdGlvbkRpc3BlbnNlCiAgICAgICAgICAgIHdoZXJlIE1lZGljYXRpb25EaXNwZW5zZS5zdGF0dXMgaW4geyAnYWN0aXZlJywgJ2NvbXBsZXRlZCcsICdvbi1ob2xkJyB9CgpkZWZpbmUgIkluaXRpYWwgUG9wdWxhdGlvbiI6CiAgZXhpc3RzKCJEZW1lbnRpYSBNZWRpY2F0aW9ucyBEaXNwZW5zZWQiKQoK\"\n          },\n          {\n            \"contentType\": \"application/elm+xml\",\n            \"data\": \"fake elm xml\"},\n          {\n            \"contentType\": \"application/elm+json\",\n            \"data\": \"fake elm json\"\n          }\n        ]\n      },\n      \"request\": {\n        \"method\": \"PUT\",\n        \"url\": \"Library/2c92808473180176bace6d1234565789\"\n  }\n  }\n  ]\n}"
+}
