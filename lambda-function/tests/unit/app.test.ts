@@ -6,6 +6,7 @@ import matMeasure from "./fixtures/measure.json";
 import matProportionMeasure from "./fixtures/measure_proportion.json";
 import matCVMeasure from "./fixtures/measure_continuousVariable.json";
 import matRatioMeasure from "./fixtures/measure_ratio.json";
+import matDefaultMeasure from "./fixtures/measure_default.json";
 import putEvent from "./fixtures/s3PutEvent.json";
 import axios from "axios";
 import { Measure, Model, PopulationType } from "@madie/madie-models";
@@ -59,6 +60,12 @@ describe("Unit test for lambda handler", () => {
     const measureToTransfer = convertToMadieMeasure(matRatioMeasure);
     expect(measureToTransfer.groups?.length).toBe(1);
     expect(measureToTransfer.groups[0].populations?.length).toBe(5);
+  });
+
+  it("test default measure group and populations", () => {
+    const measureToTransfer = convertToMadieMeasure(matDefaultMeasure);
+    expect(measureToTransfer.groups?.length).toBe(2);
+    expect(measureToTransfer.groups[0].populations?.length).toBe(2);
   });
 
   it("handles validation errors from MADiE service", async () => {
