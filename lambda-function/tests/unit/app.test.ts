@@ -65,7 +65,7 @@ describe("Unit test for lambda handler", () => {
   it("test default measure group and populations", () => {
     const measureToTransfer = convertToMadieMeasure(matDefaultMeasure);
     expect(measureToTransfer.groups?.length).toBe(2);
-    expect(measureToTransfer.groups[0].populations?.length).toBe(2);
+    expect(measureToTransfer.groups[0].populations?.length).toBe(0);
   });
 
   it("handles validation errors from MADiE service", async () => {

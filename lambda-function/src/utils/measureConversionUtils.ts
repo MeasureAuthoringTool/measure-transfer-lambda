@@ -25,6 +25,7 @@ const MEASURE_PROPERTY_MAPPINGS = {
   populationBasis: "populationBasis",
   id: "versionId",
   shortName: "ecqmTitle",
+  formattedVersion: "cmsId",
 };
 
 const POPULATION_CODE_MAPPINGS: { [key: string]: string } = {
@@ -113,8 +114,8 @@ export const convertMeasureGroups = (
       return convertPopulation(item[1]);
     });
     const allPopulations = getPopulationsForScoring(madieMeasureGroup.scoring as string);
-    const unselectedPopulations: Population[] = getUnselectedPopulations(allPopulations, populations);
-    madieMeasureGroup.populations = [...populations, ...unselectedPopulations];
+    const unselectedAndSelectedPopulations: Population[] = getAllPopulations(allPopulations, populations);
+    madieMeasureGroup.populations = unselectedAndSelectedPopulations;
 
     madieMeasureGroup.measureGroupTypes = getMeasuretypes(measuretypes);
     madieMeasureGroup.populationBasis = populationBasis;
@@ -164,7 +165,6 @@ const getMeasuretypes = (measuretypes: Array<MeasureType>): Array<MeasureGroupTy
         types.push(MeasureGroupTypes.STRUCTURE);
         break;
       default:
-        types.push(MeasureGroupTypes.OUTCOME);
         break;
     }
   });
@@ -227,7 +227,6 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
     lastModifiedBy: matMeasure.harpId,
-    cmsId: getCmsId(measureResource, "identifier"),
   } as Measure;
 
   return madieMeasure;
@@ -245,46 +244,24 @@ const getMeasurePropertyValue = (propertyName: string, measureProperties: Object
   return propertyValue;
 };
 
-const getCmsId = (measureResource: Object, property: string) => {
-  const cmsIdObj = getMatMeasureValue(measureResource, property);
-  let cmsId = "";
-  if (cmsIdObj !== null) {
-    Object.entries(cmsIdObj).forEach((item) => {
-      const identifier = item[1] as Object;
-      const objStr = JSON.stringify(item[1]);
-      if (identifier !== null && objStr.includes("ecqm") && objStr.includes("Identifier")) {
-        cmsId = getMeasurePropertyValue("value", identifier);
-      }
-    });
-  }
-  return cmsId;
-};
-
-const getMatMeasureValue = (measureResource: Object, property: string) => {
-  let matMeasureValue = null;
-  Object.entries(measureResource).forEach((item) => {
-    if (item[0] === property) {
-      matMeasureValue = item[1];
-    }
-  });
-  return matMeasureValue;
-};
-
-const getUnselectedPopulations = (allPopulations: Population[], selectedPopulations: Population[]): Population[] => {
-  const unselectedPopulations: Population[] = [];
+const getAllPopulations = (allPopulations: Population[], selectedPopulations: Population[]): Population[] => {
+  const unselectedAndSelectedPopulations: Population[] = [];
   allPopulations.forEach((population) => {
-    if (!isSelected(population, selectedPopulations)) {
-      unselectedPopulations.push(population);
+    const tempPopulation = getSelected(population, selectedPopulations);
+    if (Object.keys(tempPopulation).length === 0) {
+      unselectedAndSelectedPopulations.push(population);
+    } else {
+      unselectedAndSelectedPopulations.push(tempPopulation);
     }
   });
-  return unselectedPopulations;
+  return unselectedAndSelectedPopulations;
 };
 
-const isSelected = (population: Population, selectedPopulations: Population[]): boolean => {
-  let selected = false;
+const getSelected = (population: Population, selectedPopulations: Population[]): Population => {
+  let selected: Population = {} as Population;
   selectedPopulations.forEach((pop) => {
     if (pop.name === population.name) {
-      selected = true;
+      selected = pop;
     }
   });
   return selected;
