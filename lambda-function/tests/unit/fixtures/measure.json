@@ -1,6 +1,6 @@
 {
   "emailId": "john.doe@exploaders.com",
-  "harpId": "john_doe",
+  "harpId": "cecilia.liu@semanticbits.com",
   "manageMeasureDetailModel": {
     "id": "t634er34er34er34er34er",
     "measureName": "MedicationDispenseTest",
@@ -16,8 +16,8 @@
     "measToPeriod": "12/31/2021",
     "measScoring": "Cohort",
     "stewardValue": "SemanticBits",
-    "endorseByNQF": false,
-    "nqfId": null,
+    "endorseByNQF": true,
+    "nqfId": "testNqfId",
     "description": "MedicationDispenseTest measure For Bonnie",
     "copyright": "Test",
     "clinicalRecomms": null,
@@ -27,7 +27,10 @@
     "rationale": null,
     "improvNotations": "increase",
     "stratification": null,
-    "referencesList": [],
+    "referencesList": [
+      { "referenceText": "reference", "referenceType": "DOCUMENTATION" },
+      { "referenceText": "reference2", "referenceType": "DOCUMENTATION" }
+    ],
     "authorSelectedList": [
       {
         "id": "1.22.333.4.5.6.777777",
@@ -79,7 +82,7 @@
     "supplementalData": null,
     "disclaimer": "Test Disclaimer",
     "riskAdjustment": null,
-    "rateAggregation": null,
+    "rateAggregation": "testRateAggregation",
     "initialPop": null,
     "denominator": null,
     "denominatorExclusions": null,

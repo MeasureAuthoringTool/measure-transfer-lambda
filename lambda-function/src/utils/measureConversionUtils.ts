@@ -68,11 +68,33 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
 
 // convert measure metadata level properties
 const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
+  const developers = measureDetails.measureDetailResult?.usedAuthorList?.map((author) => {
+    return author.authorName;
+  });
+  const references = measureDetails.referencesList?.map((reference: any) => {
+    return reference;
+  });
+  const endorsement = {
+    endorser: measureDetails.endorseByNQF ? "NQF" : "",
+    endorsementId: measureDetails.nqfId,
+  };
   return {
     steward: measureDetails.stewardValue,
     description: measureDetails.description,
     copyright: measureDetails.copyright,
     disclaimer: measureDetails.disclaimer,
+    draft: true,
+    developers: developers,
+    rationale: measureDetails.rationale,
+    guidance: measureDetails.guidance,
+    clinicalRecommendation: measureDetails.clinicalRecomms,
+    references: references,
+    endorsements: [endorsement],
+    riskAdjustment: measureDetails.riskAdjustment,
+    definition: measureDetails.definitions,
+    experimental: measureDetails.experimental,
+    transmissionFormat: measureDetails.transmissionFormat,
+    supplementalDataElements: measureDetails.supplementalData,
     // TODO: keep adding new metadata fields as we support them in MADiE
   };
 };
@@ -93,11 +115,7 @@ const convertPopulation = (matPopulation: any) => {
 };
 
 // convert MAT measure groups to MADiE measure groups
-export const convertMeasureGroups = (
-  measureResourceJson: string,
-  measuretypes: any,
-  populationBasis: string,
-): Array<Group> => {
+export const convertMeasureGroups = (measureResourceJson: string, measureDetails: MeasureDetails): Array<Group> => {
   if (!measureResourceJson) {
     return [];
   }
@@ -108,6 +126,9 @@ export const convertMeasureGroups = (
     // default group scoring is measure scoring
     const madieMeasureGroup = {
       scoring: measureResource.scoring.coding[0].display,
+      populationBasis: measureDetails.populationBasis,
+      rateAggregation: measureDetails.rateAggregation,
+      improvementNotation: measureDetails.improvNotations,
     } as Group;
 
     const populations = Object.entries(group.population).map((item) => {
@@ -117,8 +138,9 @@ export const convertMeasureGroups = (
     const unselectedAndSelectedPopulations: Population[] = getAllPopulations(allPopulations, populations);
     madieMeasureGroup.populations = unselectedAndSelectedPopulations;
 
-    madieMeasureGroup.measureGroupTypes = getMeasuretypes(measuretypes);
-    madieMeasureGroup.populationBasis = populationBasis;
+    if (measureDetails.measureTypeSelectedList) {
+      madieMeasureGroup.measureGroupTypes = getMeasuretypes(measureDetails.measureTypeSelectedList);
+    }
     return madieMeasureGroup;
   });
 };
@@ -204,16 +226,10 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
 
   // convert measure properties
   const measureProperties = convertMeasureProperties(measureDetails);
-  const populationBasis = getMeasurePropertyValue("populationBasis", measureProperties);
-  const measureResource = JSON.parse(matMeasure.fhirMeasureResourceJson);
   // convert metadata properties
   const measureMetaData = convertMeasureMetadata(measureDetails);
   // convert groups
-  const measureGroups = convertMeasureGroups(
-    matMeasure.fhirMeasureResourceJson,
-    measureDetails.measureTypeSelectedList,
-    populationBasis,
-  );
+  const measureGroups = convertMeasureGroups(matMeasure.fhirMeasureResourceJson, measureDetails);
 
   // get measure library name and cql
   const { cqlLibraryName, cql } = getMeasureLibraryNameAndCql(matMeasure);
@@ -230,18 +246,6 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
   } as Measure;
 
   return madieMeasure;
-};
-
-const getMeasurePropertyValue = (propertyName: string, measureProperties: Object): string => {
-  let propertyValue = "";
-  if (measureProperties) {
-    Object.entries(measureProperties).forEach(([key, value]) => {
-      if (key === propertyName) {
-        propertyValue = value.toString();
-      }
-    });
-  }
-  return propertyValue;
 };
 
 const getAllPopulations = (allPopulations: Population[], selectedPopulations: Population[]): Population[] => {
