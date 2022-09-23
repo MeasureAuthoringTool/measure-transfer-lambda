@@ -3,6 +3,10 @@ import { Readable } from "stream";
 import { lambdaHandler } from "../../src/app";
 import { s3Client } from "../../src/s3Client";
 import matMeasure from "./fixtures/measure.json";
+import matProportionMeasure from "./fixtures/measure_proportion.json";
+import matCVMeasure from "./fixtures/measure_continuousVariable.json";
+import matRatioMeasure from "./fixtures/measure_ratio.json";
+import matDefaultMeasure from "./fixtures/measure_default.json";
 import putEvent from "./fixtures/s3PutEvent.json";
 import axios from "axios";
 import { Measure, Model, PopulationType } from "@madie/madie-models";
@@ -40,6 +44,30 @@ describe("Unit test for lambda handler", () => {
     expect(madieMeasure.cql).toContain("using QICore version '4.1.0'");
   });
 
+  it("test proportion measure group and populations", () => {
+    const measureToTransfer = convertToMadieMeasure(matProportionMeasure);
+    expect(measureToTransfer.groups?.length).toBe(1);
+    expect(measureToTransfer.groups[0].populations?.length).toBe(6);
+  });
+
+  it("test continuous variable measure group and populations", () => {
+    const measureToTransfer = convertToMadieMeasure(matCVMeasure);
+    expect(measureToTransfer.groups?.length).toBe(1);
+    expect(measureToTransfer.groups[0].populations?.length).toBe(3);
+  });
+
+  it("test ratio measure group and populations", () => {
+    const measureToTransfer = convertToMadieMeasure(matRatioMeasure);
+    expect(measureToTransfer.groups?.length).toBe(1);
+    expect(measureToTransfer.groups[0].populations?.length).toBe(5);
+  });
+
+  it("test default measure group and populations", () => {
+    const measureToTransfer = convertToMadieMeasure(matDefaultMeasure);
+    expect(measureToTransfer.groups?.length).toBe(2);
+    expect(measureToTransfer.groups[0].populations?.length).toBe(0);
+  });
+
   it("handles validation errors from MADiE service", async () => {
     s3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream });
     axios.post.mockImplementation(() => {
@@ -65,7 +93,7 @@ describe("Unit test for lambda handler", () => {
     }
   });
 
-  it("throws convert error",  () => {
+  it("throws convert error", () => {
     try {
       convertToMadieMeasure("");
     } catch (error) {
@@ -73,12 +101,12 @@ describe("Unit test for lambda handler", () => {
     }
   });
 
-  it("empty groups",  () => {
+  it("empty groups", () => {
     const madieMeasureGroup = convertMeasureGroups("", null, "");
     expect(madieMeasureGroup.length).toBe(0);
   });
 
-  it("test getPopulationType",  () => {
+  it("test getPopulationType", () => {
     let result: PopulationType = getPopulationType("numerator");
     expect(result).toBe(PopulationType.NUMERATOR);
     result = getPopulationType("numeratorExclusion");
