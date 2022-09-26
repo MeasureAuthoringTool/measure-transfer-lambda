@@ -58,8 +58,7 @@ describe("Unit test for lambda handler", () => {
 
   it("test continuous variable measure group and populations", () => {
     const measureToTransfer = convertToMadieMeasure(matCVMeasure);
-    expect(measureToTransfer.groups?.length).toBe(1);
-    expect(measureToTransfer.groups[0].populations?.length).toBe(3);
+    expect(measureToTransfer.groups?.length).toBe(0);
   });
 
   it("test ratio measure group and populations", () => {

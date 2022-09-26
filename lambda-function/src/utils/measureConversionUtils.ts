@@ -6,6 +6,7 @@ import {
   MeasureGroupTypes,
   Population,
   PopulationType,
+  MeasureScoring,
 } from "@madie/madie-models";
 import MatMeasure, { MeasureDetails, MeasureType } from "../models/MatMeasure";
 import { getPopulationsForScoring } from "./populationHelper";
@@ -51,9 +52,7 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
         value = Model.QICORE;
       }
       if ((matProperty === "measFromPeriod" || matProperty === "measToPeriod") && value) {
-        const [month, day, year] = value.split("/");
-        const date = new Date(year, month - 1, day, 1, 0, 0);
-        value = date.toISOString();
+        value = new Date(value).toISOString().split("T")[0].concat("T").concat(new Date().toISOString().split("T")[1]);
       }
       return [madieProperty, value];
     })
@@ -142,7 +141,7 @@ export const getPopulationDescription = (type: string, measureDetails: MeasureDe
 
 // convert MAT measure groups to MADiE measure groups
 export const convertMeasureGroups = (measureResourceJson: string, measureDetails: MeasureDetails): Array<Group> => {
-  if (!measureResourceJson) {
+  if (!measureResourceJson || measureDetails.measScoring === MeasureScoring.CONTINUOUS_VARIABLE) {
     return [];
   }
 
