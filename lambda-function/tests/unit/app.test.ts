@@ -10,7 +10,13 @@ import matDefaultMeasure from "./fixtures/measure_default.json";
 import putEvent from "./fixtures/s3PutEvent.json";
 import axios from "axios";
 import { Measure, Model, PopulationType } from "@madie/madie-models";
-import { convertToMadieMeasure, convertMeasureGroups, getPopulationType } from "../../src/utils/measureConversionUtils";
+import {
+  convertToMadieMeasure,
+  convertMeasureGroups,
+  getPopulationType,
+  getPopulationDescription,
+} from "../../src/utils/measureConversionUtils";
+import { MeasureDetails } from "../../src/models/MatMeasure";
 
 jest.mock("axios");
 
@@ -125,5 +131,45 @@ describe("Unit test for lambda handler", () => {
     expect(result).toBe(PopulationType.MEASURE_OBSERVATION);
     result = getPopulationType("test");
     expect(result).toBe(PopulationType.INITIAL_POPULATION);
+  });
+
+  it("test getPopulationDescription", () => {
+    const measureDetails: MeasureDetails = {
+      id: "testMeasureId",
+      measureId: "",
+      measureName: "testMeasureName",
+      measureModel: "FHIR",
+      shortName: "testMeasureShortName",
+      versionNumber: "0.000",
+      initialPop: "test Initial Population",
+      denominator: "test denominator",
+      denominatorExclusions: "test denominatorExclusions",
+      denominatorExceptions: "test denominatorExceptions",
+      numerator: "test numerator",
+      numeratorExclusions: "test numeratorExclusions",
+      measurePopulation: "test measurePopulation",
+      measurePopulationExclusions: "test measurePopulationExclusions",
+      measureObservations: "test measureObservations",
+    };
+    let result = getPopulationDescription("initialPopulation", measureDetails);
+    expect(result).toBe("test Initial Population");
+    result = getPopulationDescription("denominator", measureDetails);
+    expect(result).toBe("test denominator");
+    result = getPopulationDescription("denominatorExclusion", measureDetails);
+    expect(result).toBe("test denominatorExclusions");
+    result = getPopulationDescription("denominatorException", measureDetails);
+    expect(result).toBe("test denominatorExceptions");
+    result = getPopulationDescription("numerator", measureDetails);
+    expect(result).toBe("test numerator");
+    result = getPopulationDescription("numeratorExclusion", measureDetails);
+    expect(result).toBe("test numeratorExclusions");
+    result = getPopulationDescription("measurePopulation", measureDetails);
+    expect(result).toBe("test measurePopulation");
+    result = getPopulationDescription("measurePopulationExclusion", measureDetails);
+    expect(result).toBe("test measurePopulationExclusions");
+    result = getPopulationDescription("measureObservation", measureDetails);
+    expect(result).toBe("test measureObservations");
+    result = getPopulationDescription("default", measureDetails);
+    expect(result).toBe("test Initial Population");
   });
 });

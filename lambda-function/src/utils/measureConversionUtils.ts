@@ -104,14 +104,40 @@ type MadiePopulationType = {
 };
 
 // convert populations
-const convertPopulation = (matPopulation: any) => {
+const convertPopulation = (matPopulation: any, measureDetails: MeasureDetails) => {
   const populationCoding = matPopulation.code.coding.find((coding: any) => coding.system === POPULATION_CODING_SYSTEM);
   const code: string = POPULATION_CODE_MAPPINGS[populationCoding.code];
   return {
     id: matPopulation.id,
     name: getPopulationType(code),
     definition: matPopulation.criteria.expression,
+    description: getPopulationDescription(code, measureDetails),
   } as Population;
+};
+
+export const getPopulationDescription = (type: string, measureDetails: MeasureDetails) => {
+  switch (type) {
+    case "initialPopulation":
+      return measureDetails.initialPop;
+    case "numerator":
+      return measureDetails.numerator;
+    case "numeratorExclusion":
+      return measureDetails.numeratorExclusions;
+    case "denominator":
+      return measureDetails.denominator;
+    case "denominatorExclusion":
+      return measureDetails.denominatorExclusions;
+    case "denominatorException":
+      return measureDetails.denominatorExceptions;
+    case "measurePopulation":
+      return measureDetails.measurePopulation;
+    case "measurePopulationExclusion":
+      return measureDetails.measurePopulationExclusions;
+    case "measureObservation":
+      return measureDetails.measureObservations;
+    default:
+      return measureDetails.initialPop;
+  }
 };
 
 // convert MAT measure groups to MADiE measure groups
@@ -132,7 +158,7 @@ export const convertMeasureGroups = (measureResourceJson: string, measureDetails
     } as Group;
 
     const populations = Object.entries(group.population).map((item) => {
-      return convertPopulation(item[1]);
+      return convertPopulation(item[1], measureDetails);
     });
     const allPopulations = getPopulationsForScoring(madieMeasureGroup.scoring as string);
     const unselectedAndSelectedPopulations: Population[] = getAllPopulations(allPopulations, populations);
