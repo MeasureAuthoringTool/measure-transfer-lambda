@@ -67,11 +67,33 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
 
 // convert measure metadata level properties
 const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
+  const developers = measureDetails.measureDetailResult?.usedAuthorList?.map((author) => {
+    return author.authorName;
+  });
+  const references = measureDetails.referencesList?.map((reference: any) => {
+    return reference;
+  });
+  const endorsement = {
+    endorser: measureDetails.endorseByNQF ? "NQF" : "",
+    endorsementId: measureDetails.nqfId,
+  };
   return {
     steward: measureDetails.stewardValue,
     description: measureDetails.description,
     copyright: measureDetails.copyright,
     disclaimer: measureDetails.disclaimer,
+    draft: true,
+    developers: developers,
+    rationale: measureDetails.rationale,
+    guidance: measureDetails.guidance,
+    clinicalRecommendation: measureDetails.clinicalRecomms,
+    references: references,
+    endorsements: [endorsement],
+    riskAdjustment: measureDetails.riskAdjustment,
+    definition: measureDetails.definitions,
+    experimental: measureDetails.experimental,
+    transmissionFormat: measureDetails.transmissionFormat,
+    supplementalDataElements: measureDetails.supplementalData,
     // TODO: keep adding new metadata fields as we support them in MADiE
   };
 };
@@ -81,14 +103,40 @@ type MadiePopulationType = {
 };
 
 // convert populations
-const convertPopulation = (matPopulation: any) => {
+const convertPopulation = (matPopulation: any, measureDetails: MeasureDetails) => {
   const populationCoding = matPopulation.code.coding.find((coding: any) => coding.system === POPULATION_CODING_SYSTEM);
   const code: string = POPULATION_CODE_MAPPINGS[populationCoding.code];
   return {
     id: matPopulation.id,
     name: getPopulationType(code),
     definition: matPopulation.criteria.expression,
+    description: getPopulationDescription(code, measureDetails),
   } as Population;
+};
+
+export const getPopulationDescription = (type: string, measureDetails: MeasureDetails): any => {
+  switch (type) {
+    case "initialPopulation":
+      return measureDetails.initialPop;
+    case "numerator":
+      return measureDetails.numerator;
+    case "numeratorExclusion":
+      return measureDetails.numeratorExclusions;
+    case "denominator":
+      return measureDetails.denominator;
+    case "denominatorExclusion":
+      return measureDetails.denominatorExclusions;
+    case "denominatorException":
+      return measureDetails.denominatorExceptions;
+    case "measurePopulation":
+      return measureDetails.measurePopulation;
+    case "measurePopulationExclusion":
+      return measureDetails.measurePopulationExclusions;
+    case "measureObservation":
+      return measureDetails.measureObservations;
+    default:
+      return measureDetails.initialPop;
+  }
 };
 
 // convert MAT measure groups to MADiE measure groups
@@ -104,10 +152,12 @@ export const convertMeasureGroups = (measureResourceJson: string, measureDetails
     const madieMeasureGroup = {
       scoring: measureResource.scoring.coding[0].display,
       populationBasis: measureDetails.populationBasis,
+      rateAggregation: measureDetails.rateAggregation,
+      improvementNotation: measureDetails.improvNotations,
     } as Group;
 
     const populations = Object.entries(group.population).map((item) => {
-      return convertPopulation(item[1]);
+      return convertPopulation(item[1], measureDetails);
     });
     const allPopulations = getPopulationsForScoring(madieMeasureGroup.scoring as string);
     const unselectedAndSelectedPopulations: Population[] = getAllPopulations(allPopulations, populations);
