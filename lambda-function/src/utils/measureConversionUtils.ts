@@ -114,7 +114,7 @@ const convertPopulation = (matPopulation: any, measureDetails: MeasureDetails) =
   } as Population;
 };
 
-export const getPopulationDescription = (type: string, measureDetails: MeasureDetails) => {
+export const getPopulationDescription = (type: string, measureDetails: MeasureDetails): any => {
   switch (type) {
     case "initialPopulation":
       return measureDetails.initialPop;
