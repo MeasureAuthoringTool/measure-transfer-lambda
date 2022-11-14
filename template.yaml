@@ -37,6 +37,10 @@ Resources:
         Minify: true
         Target: "es2020"
         Sourcemap: true
+        External:
+          - "@madie/madie-models"
+          - "axios"
+          - "@aws-sdk/client-s3"
         EntryPoints:
         - src/app.ts
 
