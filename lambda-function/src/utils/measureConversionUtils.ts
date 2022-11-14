@@ -10,6 +10,7 @@ import {
 } from "@madie/madie-models";
 import MatMeasure, { MeasureDetails, MeasureType } from "../models/MatMeasure";
 import { getPopulationsForScoring } from "./populationHelper";
+import { randomUUID } from "crypto";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
@@ -278,7 +279,7 @@ const getAllPopulations = (allPopulations: Population[], selectedPopulations: Po
   allPopulations.forEach((population) => {
     const tempPopulation = getSelected(population, selectedPopulations);
     if (Object.keys(tempPopulation).length === 0) {
-      unselectedAndSelectedPopulations.push(population);
+      unselectedAndSelectedPopulations.push({ ...population, id: randomUUID() });
     } else {
       unselectedAndSelectedPopulations.push(tempPopulation);
     }
