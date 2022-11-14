@@ -54,6 +54,9 @@ describe("Unit test for lambda handler", () => {
     const measureToTransfer = convertToMadieMeasure(matProportionMeasure);
     expect(measureToTransfer.groups?.length).toBe(1);
     expect(measureToTransfer.groups[0].populations?.length).toBe(6);
+    // make sure optional population id is not empty
+    expect(measureToTransfer.groups[0].populations[2].name).toBe("denominatorExclusion");
+    expect(measureToTransfer.groups[0].populations[2].id).not.toBe("");
   });
 
   it("test continuous variable measure group and populations", () => {
