@@ -301,7 +301,7 @@ const getSelected = (population: Population, selectedPopulations: Population[]):
 
 const getCmsId = (measureResourceJson: string): string => {
   const measureResource = JSON.parse(measureResourceJson);
-  const identifier = measureResource.identifier;
-  const cmsIdentifier = identifier?.find((identifier: any) => identifier.system === CMS_IDENTIFIERR_SYSTEM);
+  const identifiers = measureResource.identifier;
+  const cmsIdentifier = identifiers?.find((identifier: any) => identifier.system === CMS_IDENTIFIERR_SYSTEM);
   return cmsIdentifier?.value;
 };
