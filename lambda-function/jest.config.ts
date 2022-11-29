@@ -4,9 +4,7 @@
  */
 
 export default {
-  transform: {
-    "^.+\\.ts?$": "esbuild-jest",
-  },
+  transform: { "\\.[jt]sx?$": "babel-jest" },
   clearMocks: true,
   collectCoverage: true,
   coverageDirectory: "coverage",
