@@ -27,7 +27,6 @@ const MEASURE_PROPERTY_MAPPINGS = {
   populationBasis: "populationBasis",
   id: "versionId",
   shortName: "ecqmTitle",
-  formattedVersion: "cmsId",
 };
 
 const POPULATION_CODE_MAPPINGS: { [key: string]: string } = {
@@ -41,6 +40,8 @@ const POPULATION_CODE_MAPPINGS: { [key: string]: string } = {
   "measure-population-exclusion": "measurePopulationExclusion",
   "measure-observation": "measureObservation",
 };
+
+const CMS_IDENTIFIERR_SYSTEM = "http://hl7.org/fhir/cqi/ecqm/Measure/Identifier/cms";
 
 // transform measure level properties
 const convertMeasureProperties = (measureDetails: MeasureDetails) => {
@@ -269,6 +270,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
     lastModifiedBy: matMeasure.harpId,
+    cmsId: getCmsId(matMeasure.fhirMeasureResourceJson),
   } as Measure;
 
   return madieMeasure;
@@ -295,4 +297,11 @@ const getSelected = (population: Population, selectedPopulations: Population[]):
     }
   });
   return selected;
+};
+
+const getCmsId = (measureResourceJson: string): string => {
+  const measureResource = JSON.parse(measureResourceJson);
+  const identifier = measureResource.identifier;
+  const cmsIdentifier = identifier?.find((identifier: any) => identifier.system === CMS_IDENTIFIERR_SYSTEM);
+  return cmsIdentifier?.value;
 };
