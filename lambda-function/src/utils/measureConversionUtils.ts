@@ -270,7 +270,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
     lastModifiedBy: matMeasure.harpId,
-    cmsId: getCmsId(matMeasure.fhirMeasureResourceJson),
+    cmsId: getCmsId(matMeasure.fhirMeasureResourceJson, measureDetails),
   } as Measure;
 
   return madieMeasure;
@@ -299,9 +299,12 @@ const getSelected = (population: Population, selectedPopulations: Population[]):
   return selected;
 };
 
-const getCmsId = (measureResourceJson: string): string => {
+const getCmsId = (measureResourceJson: string, measureDetails: MeasureDetails): string => {
   const measureResource = JSON.parse(measureResourceJson);
   const identifiers = measureResource.identifier;
-  const cmsIdentifier = identifiers?.find((identifier: any) => identifier.system === CMS_IDENTIFIERR_SYSTEM);
-  return cmsIdentifier?.value;
+  let cmsIdentifier = identifiers?.find((identifier: any) => identifier.system === CMS_IDENTIFIERR_SYSTEM)?.value;
+  if (!cmsIdentifier && measureDetails.eMeasureId !== 0) {
+    cmsIdentifier = measureDetails.eMeasureId + "FHIR";
+  }
+  return cmsIdentifier;
 };
