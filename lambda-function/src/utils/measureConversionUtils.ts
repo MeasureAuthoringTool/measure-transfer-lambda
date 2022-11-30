@@ -214,6 +214,7 @@ const getMeasuretypes = (measuretypes: Array<MeasureType>): Array<MeasureGroupTy
         types.push(MeasureGroupTypes.STRUCTURE);
         break;
       default:
+        types.push(MeasureGroupTypes.OUTCOME);
         break;
     }
   });
