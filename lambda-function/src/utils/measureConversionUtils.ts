@@ -214,11 +214,18 @@ const getMeasuretypes = (measuretypes: Array<MeasureType>): Array<MeasureGroupTy
         types.push(MeasureGroupTypes.STRUCTURE);
         break;
       default:
-        types.push(MeasureGroupTypes.OUTCOME);
+        if (!alreadyHasDefaultMeasureTye(types)) {
+          types.push(MeasureGroupTypes.OUTCOME);
+        }
         break;
     }
   });
   return types;
+};
+
+const alreadyHasDefaultMeasureTye = (measureTypes: Array<MeasureGroupTypes>) => {
+  const outcomeType = measureTypes?.find((type: any) => type === MeasureGroupTypes.OUTCOME);
+  return outcomeType ? true : false;
 };
 
 // Get measure library name and cql
