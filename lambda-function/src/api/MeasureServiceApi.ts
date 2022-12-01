@@ -1,5 +1,5 @@
 import axios from "axios";
-import Measure from "../models/Measure";
+import { Measure } from "@madie/madie-models";
 
 export class MeasureServiceApi {
   constructor(private madieMeasureServiceUrl: string, private apiKey: string) {}
@@ -16,6 +16,7 @@ export class MeasureServiceApi {
           },
         },
       );
+      console.log("Measure service Response: ", response.data);
       return response.data;
     } catch (error: any) {
       console.log("Failed to transfer the measure over to MADiE: ", JSON.stringify(error.response?.data));
