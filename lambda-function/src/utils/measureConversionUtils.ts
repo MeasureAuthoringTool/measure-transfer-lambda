@@ -202,7 +202,9 @@ const getMeasuretypes = (measuretypes: Array<MeasureType>): Array<MeasureGroupTy
   measuretypes.map((type) => {
     switch (type.description) {
       case MeasureGroupTypes.OUTCOME:
-        types.push(MeasureGroupTypes.OUTCOME);
+        if (!types.includes(MeasureGroupTypes.OUTCOME)) {
+          types.push(MeasureGroupTypes.OUTCOME);
+        }
         break;
       case MeasureGroupTypes.PATIENT_REPORTED_OUTCOME:
         types.push(MeasureGroupTypes.PATIENT_REPORTED_OUTCOME);
@@ -214,18 +216,13 @@ const getMeasuretypes = (measuretypes: Array<MeasureType>): Array<MeasureGroupTy
         types.push(MeasureGroupTypes.STRUCTURE);
         break;
       default:
-        if (!alreadyHasDefaultMeasureTye(types)) {
+        if (!types.includes(MeasureGroupTypes.OUTCOME)) {
           types.push(MeasureGroupTypes.OUTCOME);
         }
         break;
     }
   });
   return types;
-};
-
-const alreadyHasDefaultMeasureTye = (measureTypes: Array<MeasureGroupTypes>) => {
-  const outcomeType = measureTypes?.find((type: any) => type === MeasureGroupTypes.OUTCOME);
-  return outcomeType ? true : false;
 };
 
 // Get measure library name and cql
