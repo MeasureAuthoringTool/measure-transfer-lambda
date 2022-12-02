@@ -202,7 +202,9 @@ const getMeasuretypes = (measuretypes: Array<MeasureType>): Array<MeasureGroupTy
   measuretypes.map((type) => {
     switch (type.description) {
       case MeasureGroupTypes.OUTCOME:
-        types.push(MeasureGroupTypes.OUTCOME);
+        if (!types.includes(MeasureGroupTypes.OUTCOME)) {
+          types.push(MeasureGroupTypes.OUTCOME);
+        }
         break;
       case MeasureGroupTypes.PATIENT_REPORTED_OUTCOME:
         types.push(MeasureGroupTypes.PATIENT_REPORTED_OUTCOME);
@@ -214,7 +216,9 @@ const getMeasuretypes = (measuretypes: Array<MeasureType>): Array<MeasureGroupTy
         types.push(MeasureGroupTypes.STRUCTURE);
         break;
       default:
-        types.push(MeasureGroupTypes.OUTCOME);
+        if (!types.includes(MeasureGroupTypes.OUTCOME)) {
+          types.push(MeasureGroupTypes.OUTCOME);
+        }
         break;
     }
   });
