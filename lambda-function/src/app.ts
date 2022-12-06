@@ -32,9 +32,14 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
   try {
     const { Body } = await s3Client.send(new GetObjectCommand(params));
     const bodyContents = await streamToString(Body as Readable);
-    console.log("Contents:", bodyContents);
-
     const matMeasure: MatMeasure = JSON.parse(bodyContents);
+    console.log("--------MAT Measure Details-------");
+    console.log(`User: ${matMeasure.harpId}`);
+    console.log(`Measure id: ${matMeasure?.manageMeasureDetailModel.id}`);
+    console.log(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
+    console.log(`Measure version: ${matMeasure?.manageMeasureDetailModel.versionNumber}`);
+    console.log(`Measure revisionNumber: ${matMeasure?.manageMeasureDetailModel.revisionNumber}`);
+    console.log("------------------------------------");
     const madieMeasure: Measure = convertToMadieMeasure(matMeasure);
     const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
       madieMeasure,
