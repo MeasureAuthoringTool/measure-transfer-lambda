@@ -39,8 +39,10 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     console.log(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
     console.log(`Measure version: ${matMeasure?.manageMeasureDetailModel.versionNumber}`);
     console.log(`Measure revisionNumber: ${matMeasure?.manageMeasureDetailModel.revisionNumber}`);
-    console.log("------------------------------------");
+    console.log(`CMS ID: ${matMeasure?.manageMeasureDetailModel.eMeasureId}`);
+    console.log("Converting measure from MAT to MADiE format");
     const madieMeasure: Measure = convertToMadieMeasure(matMeasure);
+    console.log("Transferring measure over to MADiE");
     const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
       madieMeasure,
       matMeasure.harpId,
