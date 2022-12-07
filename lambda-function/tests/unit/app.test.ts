@@ -15,6 +15,7 @@ import {
   convertMeasureGroups,
   getPopulationType,
   getPopulationDescription,
+  getMeasureTypes,
 } from "../../src/utils/measureConversionUtils";
 import { MeasureDetails } from "../../src/models/MatMeasure";
 
@@ -173,5 +174,25 @@ describe("Unit test for lambda handler", () => {
     expect(result).toBe("test measureObservations");
     result = getPopulationDescription("default", measureDetails);
     expect(result).toBe("test Initial Population");
+  });
+
+  it("test getMeasureTypes", () => {
+    const matMeasureTypes = [
+      { id: "1", description: "Appropriate Use Process", abbrName: "ABC" },
+      { id: "2", description: "Cost/Resource Use", abbrName: "PQR" },
+      { id: "3", description: "Efficiency", abbrName: "XYZ" },
+      { id: "4", description: "Intermediate Clinical Outcome", abbrName: "XYZ" },
+      { id: "5", description: "Outcome", abbrName: "STU" },
+      { id: "6", description: "Patient Engagement/Experience", abbrName: "JKL" },
+      { id: "7", description: "Process", abbrName: "ICF" },
+      { id: "8", description: "Structure", abbrName: "NYP" },
+      { id: "9", description: "Unknown", abbrName: "HYP" },
+    ];
+    const madieMeasureTypes = getMeasureTypes(matMeasureTypes);
+    expect(madieMeasureTypes.length).toEqual(4);
+    expect(madieMeasureTypes[0]).toBe("Process");
+    expect(madieMeasureTypes[1]).toBe("Structure");
+    expect(madieMeasureTypes[2]).toBe("Outcome");
+    expect(madieMeasureTypes[3]).toBe("Patient Reported Outcome");
   });
 });

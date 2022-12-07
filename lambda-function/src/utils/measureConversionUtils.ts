@@ -11,6 +11,7 @@ import {
 import MatMeasure, { MeasureDetails, MeasureType } from "../models/MatMeasure";
 import { getPopulationsForScoring } from "./populationHelper";
 import { randomUUID } from "crypto";
+import { MatMeasureType } from "../models/MatMeasureTypes";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
@@ -100,10 +101,6 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
   };
 };
 
-type MadiePopulationType = {
-  [key: string]: string;
-};
-
 // convert populations
 const convertPopulation = (matPopulation: any, measureDetails: MeasureDetails) => {
   const populationCoding = matPopulation.code.coding.find((coding: any) => coding.system === POPULATION_CODING_SYSTEM);
@@ -162,11 +159,10 @@ export const convertMeasureGroups = (measureResourceJson: string, measureDetails
       return convertPopulation(item[1], measureDetails);
     });
     const allPopulations = getPopulationsForScoring(madieMeasureGroup.scoring as string);
-    const unselectedAndSelectedPopulations: Population[] = getAllPopulations(allPopulations, populations);
-    madieMeasureGroup.populations = unselectedAndSelectedPopulations;
+    madieMeasureGroup.populations = getAllPopulations(allPopulations, populations);
 
     if (measureDetails.measureTypeSelectedList) {
-      madieMeasureGroup.measureGroupTypes = getMeasuretypes(measureDetails.measureTypeSelectedList);
+      madieMeasureGroup.measureGroupTypes = getMeasureTypes(measureDetails.measureTypeSelectedList);
     }
     return madieMeasureGroup;
   });
@@ -197,32 +193,39 @@ export const getPopulationType = (type: string): PopulationType => {
   }
 };
 
-const getMeasuretypes = (measuretypes: Array<MeasureType>): Array<MeasureGroupTypes> => {
+export const getMeasureTypes = (measuretypes: Array<MeasureType>): Array<MeasureGroupTypes> => {
   const types: Array<MeasureGroupTypes> = [];
   measuretypes.map((type) => {
     switch (type.description) {
-      case MeasureGroupTypes.OUTCOME:
-        if (!types.includes(MeasureGroupTypes.OUTCOME)) {
-          types.push(MeasureGroupTypes.OUTCOME);
-        }
+      case MatMeasureType.PROCESS:
+      case MatMeasureType.APPROPRIATE_USE_PROCESS:
+        addMeasureType(types, MeasureGroupTypes.PROCESS);
         break;
-      case MeasureGroupTypes.PATIENT_REPORTED_OUTCOME:
-        types.push(MeasureGroupTypes.PATIENT_REPORTED_OUTCOME);
+      case MatMeasureType.STRUCTURE:
+      case MatMeasureType.COST_RESOURCE_USE:
+      case MatMeasureType.EFFICIENCY:
+        addMeasureType(types, MeasureGroupTypes.STRUCTURE);
         break;
-      case MeasureGroupTypes.PROCESS:
-        types.push(MeasureGroupTypes.PROCESS);
+      case MatMeasureType.OUTCOME:
+      case MatMeasureType.INTERMEDIATE_CLINICAL_OUTCOME:
+        addMeasureType(types, MeasureGroupTypes.OUTCOME);
         break;
-      case MeasureGroupTypes.STRUCTURE:
-        types.push(MeasureGroupTypes.STRUCTURE);
+      case MatMeasureType.PATIENT_ENGAGEMENT_EXPERIENCE:
+      case MatMeasureType.PATIENT_REPORTED_OUTCOME_PERFORMANCE:
+        addMeasureType(types, MeasureGroupTypes.PATIENT_REPORTED_OUTCOME);
         break;
       default:
-        if (!types.includes(MeasureGroupTypes.OUTCOME)) {
-          types.push(MeasureGroupTypes.OUTCOME);
-        }
+        addMeasureType(types, MeasureGroupTypes.OUTCOME);
         break;
     }
   });
   return types;
+};
+
+const addMeasureType = (measureTypes: Array<MeasureGroupTypes>, measureType: MeasureGroupTypes) => {
+  if (!measureTypes.includes(measureType)) {
+    measureTypes.push(measureType);
+  }
 };
 
 // Get measure library name and cql
