@@ -39,6 +39,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     console.log(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
     console.log(`Measure version: ${matMeasure?.manageMeasureDetailModel.versionNumber}`);
     console.log(`Measure revisionNumber: ${matMeasure?.manageMeasureDetailModel.revisionNumber}`);
+    console.log(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel.cqllibraryName}`);
     console.log(`CMS ID: ${matMeasure?.manageMeasureDetailModel.eMeasureId}`);
     console.log("Converting measure from MAT to MADiE format");
     const madieMeasure: Measure = convertToMadieMeasure(matMeasure);
@@ -52,7 +53,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     return response;
   } catch (error: any) {
     // TODO: error email notification
-    console.log("Error: ", error);
+    console.log("Error: ", error.message);
     throw new Error(error.message);
   }
 };
