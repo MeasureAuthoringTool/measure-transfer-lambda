@@ -20,7 +20,7 @@ export class MeasureServiceApi {
       return response.data;
     } catch (error: any) {
       console.log(
-        "Failed to transfer the measure (measure namee: " + measure.measureName + ") over to MADiE: ",
+        "Failed to transfer the measure (measure name: " + measure.measureName + ") over to MADiE: ",
         JSON.stringify(error.response?.data),
       );
       throw error;
