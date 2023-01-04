@@ -79,14 +79,16 @@ describe("Unit test for lambda handler", () => {
 
   it("handles validation errors from MADiE service", async () => {
     s3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream });
-    axios.post.mockImplementation(() => {
-      throw new Error("Duplicate library error");
+
+    axios.post.mockRejectedValueOnce({
+      status: 400,
+      response: { data: "Duplicate library error" },
     });
 
     try {
       await lambdaHandler(event);
     } catch (exception) {
-      expect(exception.message).toEqual("Duplicate library error");
+      expect(exception.message).toEqual('"Duplicate library error"');
     }
   });
 
