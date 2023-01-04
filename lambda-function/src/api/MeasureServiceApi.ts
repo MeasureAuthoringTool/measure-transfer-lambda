@@ -23,7 +23,7 @@ export class MeasureServiceApi {
         "Failed to transfer the measure (measure name: " + measure.measureName + ") over to MADiE: ",
         JSON.stringify(error.response?.data),
       );
-      throw error;
+      throw new Error(JSON.stringify(error.response?.data));
     }
   }
 }

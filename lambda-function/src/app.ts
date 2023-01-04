@@ -53,6 +53,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     return response;
   } catch (error: any) {
     // TODO: error email notification
+    console.error(error.message);
     throw new Error(error.message);
   }
 };
