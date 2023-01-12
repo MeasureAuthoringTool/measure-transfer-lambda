@@ -16,8 +16,6 @@ import { MatMeasureType } from "../models/MatMeasureTypes";
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
   measureSetId: "measureSetId",
-  // versionNumber: "version",
-  // revisionNumber: "revisionNumber",
   draft: "state",
   measureName: "measureName",
   cqlLibraryName: "cqlLibraryName",
