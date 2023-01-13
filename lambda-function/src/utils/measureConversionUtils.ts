@@ -16,8 +16,6 @@ import { MatMeasureType } from "../models/MatMeasureTypes";
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
   measureSetId: "measureSetId",
-  versionNumber: "version",
-  revisionNumber: "revisionNumber",
   draft: "state",
   measureName: "measureName",
   cqlLibraryName: "cqlLibraryName",
@@ -275,6 +273,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     measureMetaData: measureMetaData,
     groups: measureGroups,
     cql: cql,
+    version:buildVersion(measureDetails),
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
     lastModifiedBy: matMeasure.harpId,
@@ -283,6 +282,12 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
 
   return madieMeasure;
 };
+
+const buildVersion = (measureDetails: MeasureDetails)=>{
+  const versionBrick = measureDetails.versionNumber.split(".");
+  return `${versionBrick[0]}.${parseInt(versionBrick[1])}.${measureDetails.revisionNumber}`
+  
+}
 
 const getAllPopulations = (allPopulations: Population[], selectedPopulations: Population[]): Population[] => {
   const unselectedAndSelectedPopulations: Population[] = [];
