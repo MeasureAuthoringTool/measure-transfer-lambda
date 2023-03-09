@@ -92,6 +92,7 @@ export interface MeasureDetails {
   periodModel?: PeriodModel;
   endorsement?: string;
   endorsementId?: string;
+  endorserSystemId?: string;
   nqfModel?: NQFModel;
   measureOwnerId?: string;
   measurePopulationExclusions?: string;

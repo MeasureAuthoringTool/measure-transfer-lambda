@@ -77,6 +77,7 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
   const endorsement = {
     endorser: measureDetails.endorseByNQF ? "NQF" : "",
     endorsementId: measureDetails.nqfId,
+    endorserSystemId: measureDetails.endorseByNQF ? "https://www.qualityforum.org" : ""
   };
   return {
     steward: measureDetails.stewardValue,
