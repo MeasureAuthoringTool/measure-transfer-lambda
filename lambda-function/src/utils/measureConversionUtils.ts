@@ -7,6 +7,7 @@ import {
   Population,
   PopulationType,
   MeasureScoring,
+  Endorsement,
 } from "@madie/madie-models";
 import MatMeasure, { MeasureDetails, MeasureType } from "../models/MatMeasure";
 import { getPopulationsForScoring } from "./populationHelper";
@@ -77,7 +78,8 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
   const endorsement = {
     endorser: measureDetails.endorseByNQF ? "NQF" : "",
     endorsementId: measureDetails.nqfId,
-  };
+    endorserSystemId: measureDetails.endorseByNQF ? "https://www.qualityforum.org" : ""
+  } as Endorsement;
   return {
     steward: measureDetails.stewardValue,
     description: measureDetails.description,
