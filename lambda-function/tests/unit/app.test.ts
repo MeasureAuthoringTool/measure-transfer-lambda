@@ -50,6 +50,8 @@ describe("Unit test for lambda handler", () => {
     expect(madieMeasure.createdBy).toEqual(matMeasure.harpId);
     expect(madieMeasure).toHaveProperty("cql");
     expect(madieMeasure.cql).toContain("using QICore version '4.1.0'");
+    expect(madieMeasure.measureMetaData.steward).toMatchObject({ name: "SemanticBits" });
+    expect(madieMeasure.measureMetaData.developers).toMatchObject([{ name: "Able Health" }, { name: "SemanticBits" }]);
   });
 
   it("test proportion measure group and populations", () => {

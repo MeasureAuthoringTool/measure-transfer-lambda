@@ -1,13 +1,13 @@
 import {
+  Endorsement,
   Group,
   Measure,
-  MeasureMetadata,
-  Model,
   MeasureGroupTypes,
+  MeasureMetadata,
+  MeasureScoring,
+  Model,
   Population,
   PopulationType,
-  MeasureScoring,
-  Endorsement,
 } from "@madie/madie-models";
 import MatMeasure, { MeasureDetails, MeasureType } from "../models/MatMeasure";
 import { getPopulationsForScoring } from "./populationHelper";
@@ -70,7 +70,9 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
 // convert measure metadata level properties
 const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
   const developers = measureDetails.measureDetailResult?.usedAuthorList?.map((author) => {
-    return author.authorName;
+    return {
+      name: author.authorName,
+    };
   });
   const references = measureDetails.referencesList?.map((reference: any) => {
     return reference;
@@ -78,10 +80,10 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
   const endorsement = {
     endorser: measureDetails.endorseByNQF ? "NQF" : "",
     endorsementId: measureDetails.nqfId,
-    endorserSystemId: measureDetails.endorseByNQF ? "https://www.qualityforum.org" : ""
+    endorserSystemId: measureDetails.endorseByNQF ? "https://www.qualityforum.org" : "",
   } as Endorsement;
   return {
-    steward: measureDetails.stewardValue,
+    steward: { name: measureDetails.stewardValue },
     description: measureDetails.description,
     copyright: measureDetails.copyright,
     disclaimer: measureDetails.disclaimer,
@@ -275,7 +277,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     measureMetaData: measureMetaData,
     groups: measureGroups,
     cql: cql,
-    version:buildVersion(measureDetails),
+    version: buildVersion(measureDetails),
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
     lastModifiedBy: matMeasure.harpId,
@@ -285,11 +287,10 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
   return madieMeasure;
 };
 
-const buildVersion = (measureDetails: MeasureDetails)=>{
+const buildVersion = (measureDetails: MeasureDetails) => {
   const versionBrick = measureDetails.versionNumber.split(".");
-  return `${versionBrick[0]}.${parseInt(versionBrick[1])}.${measureDetails.revisionNumber}`
-  
-}
+  return `${versionBrick[0]}.${parseInt(versionBrick[1])}.${measureDetails.revisionNumber}`;
+};
 
 const getAllPopulations = (allPopulations: Population[], selectedPopulations: Population[]): Population[] => {
   const unselectedAndSelectedPopulations: Population[] = [];
