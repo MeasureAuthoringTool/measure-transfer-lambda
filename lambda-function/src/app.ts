@@ -28,7 +28,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     Bucket: bucket,
     Key: key,
   };
-
+  let madieMeasure: Measure = {} as Measure;
   try {
     const { Body } = await s3Client.send(new GetObjectCommand(params));
     const bodyContents = await streamToString(Body as Readable);
@@ -42,7 +42,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     console.log(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel.cqllibraryName}`);
     console.log(`CMS ID: ${matMeasure?.manageMeasureDetailModel.eMeasureId}`);
     console.log("Converting measure from MAT to MADiE format");
-    const madieMeasure: Measure = convertToMadieMeasure(matMeasure);
+    madieMeasure = convertToMadieMeasure(matMeasure);
     console.log("Transferring measure over to MADiE");
     const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
       madieMeasure,
@@ -54,6 +54,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
   } catch (error: any) {
     // TODO: error email notification
     console.error(error.message);
-    throw new Error(error.message);
+
+    return madieMeasure;
   }
 };
