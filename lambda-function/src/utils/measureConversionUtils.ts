@@ -4,15 +4,20 @@ import {
   Measure,
   MeasureGroupTypes,
   MeasureMetadata,
+  MeasureObservation,
   MeasureScoring,
   Model,
   Population,
   PopulationType,
+  SupplementalData,
 } from "@madie/madie-models";
-import MatMeasure, { MeasureDetails, MeasureType } from "../models/MatMeasure";
+import MatMeasure, { MeasureDetailResult, MeasureDetails, MeasureType } from "../models/MatMeasure";
 import { getPopulationsForScoring } from "./populationHelper";
 import { randomUUID } from "crypto";
 import { MatMeasureType } from "../models/MatMeasureTypes";
+import { XMLParser } from "fast-xml-parser";
+import * as _ from "lodash";
+import { Stratification } from "@madie/madie-models/dist/Measure";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
@@ -25,6 +30,7 @@ const MEASURE_PROPERTY_MAPPINGS = {
   measFromPeriod: "measurementPeriodStart",
   measToPeriod: "measurementPeriodEnd",
   populationBasis: "populationBasis",
+  patientBased: "patientBasis",
   id: "versionId",
   shortName: "ecqmTitle",
 };
@@ -49,9 +55,9 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
     .map(([matProperty, madieProperty]) => {
       // @ts-ignore
       let value = measureDetails[matProperty];
-      // all fhir measures imported as QI-Core
-      if (matProperty === "fhir" && value) {
-        value = Model.QICORE;
+      // all fhir measures imported as QI-Core, else QDM 5.6
+      if (matProperty === "fhir") {
+        value = value ? Model.QICORE : Model.QDM_5_6;
       }
       if ((matProperty === "measFromPeriod" || matProperty === "measToPeriod") && value) {
         value = new Date(value).toISOString().split("T")[0].concat("T").concat(new Date().toISOString().split("T")[1]);
@@ -138,6 +144,96 @@ export const getPopulationDescription = (type: string, measureDetails: MeasureDe
     default:
       return measureDetails.initialPop;
   }
+};
+
+export const isPopulation = (type: string): boolean => {
+  return type !== "stratum" && type !== "measureObservation";
+};
+
+export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: MeasureDetails) => {
+  const parser = new XMLParser({ ignoreAttributes: false });
+  const simpleMeasure = parser.parse(simpleXml);
+  const groups = simpleMeasure?.measure?.measureGrouping?.group;
+
+  const measureGroupTypes = measureDetails.measureTypeSelectedList
+    ? getMeasureTypes(measureDetails.measureTypeSelectedList)
+    : undefined;
+
+  const scoring: string = measureDetails.measScoring ?? MeasureScoring.COHORT;
+  const allPopulations = getPopulationsForScoring(scoring);
+
+  return groups?.map((group: any) => {
+    const ucumUnits = group["@_ucum"];
+
+    const observations = group.clause
+      .filter((population: any) => population["@_type"] === "measureObservation")
+      .map((population: any) => {
+        const criteriaReference =
+          scoring === MeasureScoring.RATIO
+            ? population["@_associatedPopulationUUID"]
+            : group.clause.find(
+                (searchPop: any) =>
+                  searchPop["@_isInGrouping"] === "true" && searchPop["@_type"] === "measurePopulation",
+              )?.["@_uuid"];
+
+        return {
+          id: population["@_uuid"],
+          aggregateMethod: population.cqlaggfunction["@_displayName"],
+          definition: population.cqlaggfunction.cqlfunction["@_displayName"],
+          criteriaReference: criteriaReference,
+        } as MeasureObservation;
+      });
+
+    const populations = group.clause
+      .filter((population: any) => isPopulation(population["@_type"]) && population["@_isInGrouping"] === "true")
+      .map((population: any) => {
+        const popType = population["@_type"];
+        return {
+          id: population["@_uuid"],
+          name: popType,
+          definition: population.cqldefinition["@_displayName"],
+          description: getPopulationDescription(popType, measureDetails),
+        } as Population;
+      });
+
+    const pops = getAllPopulations(allPopulations, populations);
+
+    // seems like a grouping in MAT can only have a single stratification, but that has multiple stratums
+    // which does not align directly with stratification representation in MADiE...
+    // convert MAT stratum to MADiE stratifications
+    const stratifications = [
+      ...group.clause
+        .filter((population: any) => population["@_type"] === "stratum" && population["@_isInGrouping"] !== "false")
+        .map((population: any) => {
+          const stratDefine = population.cqldefinition["@_displayName"];
+          const stratRefPop = group.clause.find(
+            (refPop: any) => refPop?.cqldefinition?.["@_displayName"] === stratDefine,
+          );
+
+          return {
+            cqlDefinition: stratDefine,
+            // attempt to match association based on define
+            // association is required in MADiE..so default to IP per getPopulationType
+            association: getPopulationType(stratRefPop?.["@_type"]),
+          } as Stratification;
+        }),
+    ];
+
+    return {
+      id: undefined as unknown as string,
+      scoring: measureDetails.measScoring,
+      // populations: getAllPopulations(allPopulations, populations),
+      populations: pops,
+      measureObservations: _.isNil(observations) || _.isEmpty(observations) ? null : observations,
+      groupDescription: undefined,
+      rateAggregation: measureDetails.rateAggregation,
+      improvementNotation: measureDetails.improvNotations,
+      scoringUnit: ucumUnits,
+      stratifications: _.isNil(stratifications) || _.isEmpty(stratifications) ? undefined : stratifications,
+      measureGroupTypes: measureGroupTypes,
+      populationBasis: `${measureDetails.patientBased}`,
+    } as Group;
+  });
 };
 
 // convert MAT measure groups to MADiE measure groups
@@ -254,6 +350,47 @@ const getMeasureLibraryNameAndCql = (matMeasure: MatMeasure): { cqlLibraryName: 
   };
 };
 
+const getQdmMeasureLibraryNameAndCql = (matMeasure: MatMeasure): { cqlLibraryName: string; cql: string } => {
+  return {
+    cqlLibraryName: matMeasure.manageMeasureDetailModel.cqllibraryName ?? "",
+    cql: matMeasure.cql,
+  };
+};
+
+const getSupplementalData = (matMeasure: MatMeasure): SupplementalData[] | undefined => {
+  let supplementalData = undefined;
+  if (matMeasure.manageMeasureDetailModel.measureModel === "QDM") {
+    const parser = new XMLParser({ ignoreAttributes: false });
+    const simpleMeasure = parser.parse(matMeasure.simpleXml);
+    supplementalData = simpleMeasure.measure?.supplementalDataElements?.cqldefinition?.map(
+      (sde: any) =>
+        ({
+          definition: sde["@_displayName"],
+        } as SupplementalData),
+    );
+  }
+  // currently, continuing to skip this for FHIR
+
+  return supplementalData;
+};
+
+const getRiskAdjustments = (matMeasure: MatMeasure) => {
+  let riskAdjustments = undefined;
+  if (matMeasure.manageMeasureDetailModel.measureModel === "QDM") {
+    const parser = new XMLParser({ ignoreAttributes: false });
+    const simpleMeasure = parser.parse(matMeasure.simpleXml);
+    riskAdjustments = simpleMeasure.measure?.riskAdjustmentVariables?.cqldefinition?.map(
+      (rav: any) =>
+        ({
+          definition: rav["@_displayName"],
+        } as SupplementalData),
+    );
+  }
+  // currently, continuing to skip this for FHIR
+
+  return riskAdjustments;
+};
+
 // convert MAT measure to MADiE measure
 export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
   if (!matMeasure) {
@@ -262,14 +399,25 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
   const measureDetails: MeasureDetails = matMeasure.manageMeasureDetailModel;
 
   // convert measure properties
-  const measureProperties = convertMeasureProperties(measureDetails);
+  const measureProperties: any = convertMeasureProperties(measureDetails);
   // convert metadata properties
   const measureMetaData = convertMeasureMetadata(measureDetails);
   // convert groups
-  const measureGroups = convertMeasureGroups(matMeasure.fhirMeasureResourceJson, measureDetails);
+  const measureGroups =
+    matMeasure.manageMeasureDetailModel.measureModel === "QDM"
+      ? convertQdmMeasureGroups(matMeasure.simpleXml, measureDetails)
+      : convertMeasureGroups(matMeasure.fhirMeasureResourceJson, measureDetails);
 
   // get measure library name and cql
-  const { cqlLibraryName, cql } = getMeasureLibraryNameAndCql(matMeasure);
+  const { cqlLibraryName, cql } =
+    matMeasure.manageMeasureDetailModel.measureModel === "QDM"
+      ? getQdmMeasureLibraryNameAndCql(matMeasure)
+      : getMeasureLibraryNameAndCql(matMeasure);
+
+  const cmsId =
+    matMeasure.manageMeasureDetailModel.measureModel === "QDM"
+      ? matMeasure.manageMeasureDetailModel.eMeasureId
+      : getCmsId(matMeasure.fhirMeasureResourceJson, measureDetails);
 
   const madieMeasure = {
     ...measureProperties,
@@ -277,11 +425,14 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     measureMetaData: measureMetaData,
     groups: measureGroups,
     cql: cql,
+    scoring: matMeasure.manageMeasureDetailModel.measureModel === "QDM" ? measureProperties.measureScoring : undefined,
     version: buildVersion(measureDetails),
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
     lastModifiedBy: matMeasure.harpId,
-    cmsId: getCmsId(matMeasure.fhirMeasureResourceJson, measureDetails),
+    supplementalData: getSupplementalData(matMeasure),
+    riskAdjustments: getRiskAdjustments(matMeasure),
+    cmsId,
   } as Measure;
 
   return madieMeasure;

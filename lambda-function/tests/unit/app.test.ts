@@ -8,6 +8,9 @@ import matCVMeasure from "./fixtures/measure_continuousVariable.json";
 import matRatioMeasure from "./fixtures/measure_ratio.json";
 import matDefaultMeasure from "./fixtures/measure_default.json";
 import putEvent from "./fixtures/s3PutEvent.json";
+import matQdmCvMeasure from "./fixtures/measure_qdm.json";
+import matQdmProportionMeasure from "./fixtures/measure_qdm_proportion.json";
+import matQdmRatioMeasure from "./fixtures/measure_qdm_ratio.json";
 import axios from "axios";
 import { Measure, Model, PopulationType } from "@madie/madie-models";
 import {
@@ -78,6 +81,82 @@ describe("Unit test for lambda handler", () => {
     const measureToTransfer = convertToMadieMeasure(matDefaultMeasure);
     expect(measureToTransfer.groups?.length).toBe(2);
     expect(measureToTransfer.groups[0].populations?.length).toBe(0);
+  });
+
+  it("test QDM ratio measure conversion", () => {
+    const measureToTransfer = convertToMadieMeasure(matQdmRatioMeasure);
+    expect(measureToTransfer).toBeTruthy();
+    expect(measureToTransfer.measureName).toEqual("Qdm4");
+    expect(measureToTransfer.cqlLibraryName).toEqual("CMS1179");
+    expect(measureToTransfer.scoring).toEqual("Ratio");
+    expect(measureToTransfer.patientBasis).toEqual(true);
+    expect(measureToTransfer.model).toEqual("QDM v5.6");
+    expect(measureToTransfer.groups).toBeTruthy();
+    expect(measureToTransfer.groups.length).toEqual(2);
+    expect(measureToTransfer.supplementalData).toBeTruthy();
+    expect(measureToTransfer.supplementalData.length).toEqual(4);
+    expect(measureToTransfer.riskAdjustments).toBeTruthy();
+    expect(measureToTransfer.riskAdjustments.length).toEqual(2);
+
+    expect(measureToTransfer.groups[0].scoring).toEqual("Ratio");
+    expect(measureToTransfer.groups[0].populations.length).toEqual(5);
+    expect(measureToTransfer.groups[0].measureObservations.length).toEqual(2);
+    const g1Obs1CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[0]?.criteriaReference;
+    expect(g1Obs1CriteriaRef).toBeTruthy();
+    // referenced population should exist!
+    const g1Obs1RefPop = measureToTransfer?.groups?.[0]?.populations?.find((pop) => pop.id === g1Obs1CriteriaRef);
+    expect(g1Obs1RefPop).toBeTruthy();
+    const g1Obs2CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[1]?.criteriaReference;
+    expect(g1Obs2CriteriaRef).toBeTruthy();
+    // referenced population should exist!
+    const g1Obs2RefPop = measureToTransfer?.groups?.[0]?.populations?.find((pop) => pop.id === g1Obs2CriteriaRef);
+    expect(g1Obs2RefPop).toBeTruthy();
+  });
+
+  it("test QDM CV measure conversion", () => {
+    const measureToTransfer = convertToMadieMeasure(matQdmCvMeasure);
+    expect(measureToTransfer).toBeTruthy();
+    expect(measureToTransfer.measureName).toEqual("ObsTestTransfer");
+    expect(measureToTransfer.cqlLibraryName).toEqual("CMS1175");
+    expect(measureToTransfer.scoring).toEqual("Continuous Variable");
+    expect(measureToTransfer.patientBasis).toEqual(false);
+    expect(measureToTransfer.model).toEqual("QDM v5.6");
+    expect(measureToTransfer.groups).toBeTruthy();
+    expect(measureToTransfer.groups.length).toEqual(3);
+    expect(measureToTransfer.supplementalData).toBeTruthy();
+    expect(measureToTransfer.supplementalData.length).toEqual(4);
+    expect(measureToTransfer.riskAdjustments).toBeFalsy();
+
+    expect(measureToTransfer.groups[0].scoring).toEqual("Continuous Variable");
+    expect(measureToTransfer.groups[0].populations.length).toEqual(3);
+    expect(measureToTransfer.groups[0].measureObservations.length).toEqual(1);
+    const g1Obs1CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[0]?.criteriaReference;
+    expect(g1Obs1CriteriaRef).toBeTruthy();
+    // referenced population should exist!
+    const g1Obs1RefPop = measureToTransfer?.groups?.[0]?.populations?.find((pop) => pop.id === g1Obs1CriteriaRef);
+    expect(g1Obs1RefPop).toBeTruthy();
+  });
+
+  it("test QDM Proportion measure conversion", () => {
+    const measureToTransfer = convertToMadieMeasure(matQdmProportionMeasure);
+    expect(measureToTransfer).toBeTruthy();
+    expect(measureToTransfer.measureName).toEqual("Qdm3");
+    expect(measureToTransfer.cqlLibraryName).toEqual("CMS1177");
+    expect(measureToTransfer.scoring).toEqual("Proportion");
+    expect(measureToTransfer.patientBasis).toEqual(true);
+    expect(measureToTransfer.model).toEqual("QDM v5.6");
+    expect(measureToTransfer.groups).toBeTruthy();
+    expect(measureToTransfer.groups.length).toEqual(2);
+    expect(measureToTransfer.supplementalData).toBeTruthy();
+    expect(measureToTransfer.supplementalData.length).toEqual(4);
+    expect(measureToTransfer.riskAdjustments).toBeFalsy();
+
+    expect(measureToTransfer.groups[0].scoring).toEqual("Proportion");
+    expect(measureToTransfer.groups[0].populations.length).toEqual(6);
+    expect(measureToTransfer.groups[0].measureObservations).toBeFalsy();
+    expect(measureToTransfer.groups[0].stratifications).toBeTruthy();
+    expect(measureToTransfer.groups[0].stratifications.length).toEqual(2);
+    // expect(measureToTransfer.groups[0].stratifications[0]).toEqual(1);
   });
 
   it("handles validation errors from MADiE service", async () => {

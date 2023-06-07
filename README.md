@@ -8,7 +8,7 @@ Lambda function reads the measure json file uploaded to S3 bucket(see `./templat
 
 This project contains source code and supporting files that you can deploy with the SAM CLI. It includes the following files and folders.
 
-  - lambda-function - Code for the application's Lambda function.
+  - lambda-function - Code for the application's Lambda function.[.zshrc](..%2F..%2F..%2F.zshrc)
   - lambda-function/tests - Unit tests for the application code. 
   - template.yaml - A template that defines the application's AWS resources.
 
@@ -21,6 +21,8 @@ Build your application with the `sam build` command.
 ```bash
 measure-transfer-lambda$ sam build
 ```
+
+If you receive an error related to cmake while running `sam build` you may need to manually install cmake in order to proceed. This can be done with homebrew `brew install cmake`.
 
 The SAM CLI installs dependencies defined in `lambda-function/package.json`, compiles TypeScript with esbuild, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 

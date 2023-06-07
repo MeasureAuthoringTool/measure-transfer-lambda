@@ -1,0 +1,111 @@
+{
+  "emailId": "nathaniel.moraca@icf.com",
+  "harpId": "nathaniel.moraca@icf.com",
+  "manageMeasureDetailModel": {
+    "id": "4028c4bc888ffa0a0188909cf79a0004",
+    "measureName": "Qdm3",
+    "measureModel": "QDM",
+    "shortName": "Qdm3",
+    "versionNumber": "0.000",
+    "revisionNumber": "1",
+    "measureId": null,
+    "groupName": null,
+    "groupId": "88d598ad-1108-4ac9-93f7-66838ef1bacb",
+    "finalizedDate": null,
+    "measFromPeriod": "12/31/2022",
+    "measToPeriod": "12/07/2023",
+    "measScoring": "Proportion",
+    "stewardValue": "SemanticBits",
+    "endorseByNQF": false,
+    "nqfId": null,
+    "description": null,
+    "copyright": null,
+    "clinicalRecomms": null,
+    "definitions": null,
+    "guidance": null,
+    "transmissionFormat": null,
+    "rationale": null,
+    "improvNotations": null,
+    "stratification": null,
+    "referencesList": [],
+    "authorSelectedList": [
+      {
+        "id": "02c84f54-919b-4464-bf51-a1438f2710e2",
+        "authorName": "SemanticBits",
+        "orgId": "02c84f54-919b-4464-bf51-a1438f2710e2"
+      }
+    ],
+    "stewardSelectedList": null,
+    "measureTypeSelectedList": [],
+    "qdsSelectedList": null,
+    "componentMeasuresSelectedList": null,
+    "toCompareAuthor": null,
+    "toCompareMeasure": null,
+    "toCompareComponentMeasures": null,
+    "draft": true,
+    "measureSetId": "88d598ad-1108-4ac9-93f7-66838ef1bacb",
+    "valueSetDate": null,
+    "supplementalData": null,
+    "disclaimer": null,
+    "riskAdjustment": null,
+    "rateAggregation": null,
+    "initialPop": null,
+    "denominator": null,
+    "denominatorExclusions": null,
+    "numerator": null,
+    "numeratorExclusions": null,
+    "denominatorExceptions": null,
+    "measurePopulation": null,
+    "measureObservations": null,
+    "eMeasureId": 1177,
+    "orgVersionNumber": "0.0.001",
+    "qltyMeasureSetUuid": "88d598ad-1108-4ac9-93f7-66838ef1bacb",
+    "stewardId": "207",
+    "scoringAbbr": "PROPOR",
+    "periodModel": {
+      "uuid": "aea93c0b-5b19-41f5-bb3d-f77fa4824a1e",
+      "startDate": "12/31/2022",
+      "stopDate": "12/07/2023",
+      "calenderYear": false
+    },
+    "endorsement": null,
+    "endorsementId": null,
+    "nqfModel": {
+      "root": "2.16.840.1.113883.3.560.1",
+      "extension": null
+    },
+    "measureOwnerId": "2c9280857d3924c5017d482abdfe0157",
+    "measurePopulationExclusions": "",
+    "measureDetailResult": {
+      "usedSteward": {
+        "id": "207",
+        "orgName": "SemanticBits",
+        "orgOid": "02c84f54-919b-4464-bf51-a1438f2710e2"
+      },
+      "usedAuthorList": [
+        {
+          "id": "207",
+          "authorName": "SemanticBits",
+          "orgId": "02c84f54-919b-4464-bf51-a1438f2710e2"
+        }
+      ],
+      "allAuthorList": null,
+      "allStewardList": null
+    },
+    "qdmVersion": "5.6",
+    "fhirVersion": null,
+    "formattedVersion": "Draft v0.0.001",
+    "experimental": false,
+    "populationBasis": "",
+    "editable": false,
+    "calenderYear": false,
+    "patientBased": true,
+    "cqllibraryName": "CMS1177",
+    "fhir": false,
+    "deleted": false
+  },
+  "fhirMeasureResourceJson": null,
+  "fhirLibraryResourcesJson": null,
+  "cql": "library CMS1177 version '0.0.001'\r\n\r\nusing QDM version '5.6'\r\n\r\nvalueset \"Ethnicity\": 'urn:oid:2.16.840.1.114222.4.11.837'\r\nvalueset \"ONC Administrative Sex\": 'urn:oid:2.16.840.1.113762.1.4.1'\r\nvalueset \"Payer\": 'urn:oid:2.16.840.1.114222.4.11.3591'\r\nvalueset \"Race\": 'urn:oid:2.16.840.1.114222.4.11.836'\r\n\r\ncontext Patient\r\n\r\ndefine \"SDE Ethnicity\":\r\n  [\"Patient Characteristic Ethnicity\": \"Ethnicity\"]\r\n\r\ndefine \"SDE Payer\":\r\n  [\"Patient Characteristic Payer\": \"Payer\"]\r\n\r\ndefine \"SDE Race\":\r\n  [\"Patient Characteristic Race\": \"Race\"]\r\n\r\ndefine \"SDE Sex\":\r\n  [\"Patient Characteristic Sex\": \"ONC Administrative Sex\"]\r\n\r\ndefine \"ipp\":\r\n  true\r\n\r\ndefine \"den\":\r\n  false\r\n\r\ndefine \"num\":\r\n  \"ipp\"",
+  "simpleXml": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><measure> <cqlLookUp><library>CMS1177</library><version>0.0.001</version><usingModel>QDM</usingModel><usingModelVersion>5.6</usingModelVersion><cqlContext>Patient</cqlContext><valuesets><valueset datatype=\"Patient Characteristic Ethnicity\" id=\"fad693ad-a6db-4ccd-9bbb-c03a33ca685f\" isValidatedWithVsac=\"VALID\" name=\"Ethnicity\" oid=\"2.16.840.1.114222.4.11.837\" originalName=\"Ethnicity\" program=\"\" release=\"\" suffix=\"\" suppDataElement=\"false\" taxonomy=\"CDC\" type=\"Extensional\" uuid=\"99279307-7b56-424b-b92e-9c4a78b34ac1\" version=\"\"/><valueset datatype=\"Patient Characteristic Sex\" id=\"ad2a2a42-5cda-4ab6-a689-62d29ca62d79\" isValidatedWithVsac=\"VALID\" name=\"ONC Administrative Sex\" oid=\"2.16.840.1.113762.1.4.1\" originalName=\"ONC Administrative Sex\" program=\"\" release=\"\" suffix=\"\" suppDataElement=\"false\" taxonomy=\"Administrative Sex\" type=\"Extensional\" uuid=\"dbd8e075-082f-4c8e-aeb9-458b34cfb55e\" version=\"\"/><valueset datatype=\"Patient Characteristic Payer\" id=\"c168e8d7-6fdc-4f4a-9335-ec0b1253fdca\" isValidatedWithVsac=\"VALID\" name=\"Payer\" oid=\"2.16.840.1.114222.4.11.3591\" originalName=\"Payer\" program=\"\" release=\"\" suffix=\"\" suppDataElement=\"false\" taxonomy=\"Source of Payment Typology\" type=\"Extensional\" uuid=\"a0869052-e161-49b1-9a96-674e7241a043\" version=\"\"/><valueset datatype=\"Patient Characteristic Race\" id=\"1e64c147-e8a7-46ac-bcde-a972193e1996\" isValidatedWithVsac=\"VALID\" name=\"Race\" oid=\"2.16.840.1.114222.4.11.836\" originalName=\"Race\" program=\"\" release=\"\" suffix=\"\" suppDataElement=\"false\" taxonomy=\"CDC\" type=\"Extensional\" uuid=\"0b7e0dba-9562-45ec-a82d-54c4959b5cae\" version=\"\"/></valuesets><parameters/><definitions><definition context=\"Patient\" id=\"e93f9c2b-094f-4ebc-9683-d7098059cae4\" name=\"SDE Ethnicity\" popDefinition=\"false\" supplDataElement=\"true\"><logic>[\"Patient Characteristic Ethnicity\": \"Ethnicity\"]</logic><comment/></definition><definition context=\"Patient\" id=\"88216f89-fef6-4ec7-b792-282dd6025608\" name=\"SDE Payer\" popDefinition=\"false\" supplDataElement=\"true\"><logic>[\"Patient Characteristic Payer\": \"Payer\"]</logic><comment/></definition><definition context=\"Patient\" id=\"5cf2ede2-bfe6-4c15-a5bb-930be3946aa1\" name=\"SDE Race\" popDefinition=\"false\" supplDataElement=\"true\"><logic>[\"Patient Characteristic Race\": \"Race\"]</logic><comment/></definition><definition context=\"Patient\" id=\"d71d628f-2c64-4788-b7ce-08c0b3912a9e\" name=\"SDE Sex\" popDefinition=\"false\" supplDataElement=\"true\"><logic>[\"Patient Characteristic Sex\": \"ONC Administrative Sex\"]</logic><comment/></definition><definition context=\"Patient\" id=\"722989ff-72b4-4879-9da2-5d4bb2adf058\" name=\"ipp\" popDefinition=\"false\" supplDataElement=\"false\"><logic>true</logic><comment/></definition><definition context=\"Patient\" id=\"201c282d-ea86-4f55-b527-d1aced6740ff\" name=\"den\" popDefinition=\"false\" supplDataElement=\"false\"><logic>false</logic><comment/></definition><definition context=\"Patient\" id=\"79f0d26f-6c3d-4489-b9f0-de5fce8ed003\" name=\"num\" popDefinition=\"false\" supplDataElement=\"false\"><logic>\"ipp\"</logic><comment/></definition></definitions></cqlLookUp><supplementalDataElements><cqldefinition displayName=\"SDE Ethnicity\" uuid=\"e93f9c2b-094f-4ebc-9683-d7098059cae4\"/><cqldefinition displayName=\"SDE Payer\" uuid=\"88216f89-fef6-4ec7-b792-282dd6025608\"/><cqldefinition displayName=\"SDE Race\" uuid=\"5cf2ede2-bfe6-4c15-a5bb-930be3946aa1\"/><cqldefinition displayName=\"SDE Sex\" uuid=\"d71d628f-2c64-4788-b7ce-08c0b3912a9e\"/></supplementalDataElements><riskAdjustmentVariables/><measureGrouping><group sequence=\"1\" ucum=\"\"><clause displayName=\"Initial Population 1\" isInGrouping=\"true\" type=\"initialPopulation\" uuid=\"BE1EA5BF-F97F-4FD1-8964-F8EBA1024429\"><cqldefinition displayName=\"ipp\" uuid=\"722989ff-72b4-4879-9da2-5d4bb2adf058\"/></clause><clause displayName=\"Denominator 1\" isInGrouping=\"true\" type=\"denominator\" uuid=\"1EE3F024-F74E-4CC9-B213-E4C1424BA620\"><cqldefinition displayName=\"den\" uuid=\"201c282d-ea86-4f55-b527-d1aced6740ff\"/></clause><clause displayName=\"Numerator 1\" isInGrouping=\"true\" type=\"numerator\" uuid=\"5A654E78-8BF8-4A88-AC5F-A81612D271D2\"><cqldefinition displayName=\"num\" uuid=\"79f0d26f-6c3d-4489-b9f0-de5fce8ed003\"/></clause><clause displayName=\"Stratum 1\" type=\"stratum\" uuid=\"14B8FAF6-A0EC-45B6-B8F7-F0835F00B884\"><cqldefinition displayName=\"ipp\" uuid=\"722989ff-72b4-4879-9da2-5d4bb2adf058\"/></clause><clause displayName=\"Stratum 2\" type=\"stratum\" uuid=\"1C329B95-0B82-4C20-AB80-79FBC78191B9\"><cqldefinition displayName=\"num\" uuid=\"79f0d26f-6c3d-4489-b9f0-de5fce8ed003\"/></clause><clause displayName=\"denominatorExclusions\" isInGrouping=\"false\" type=\"denominatorExclusions\" uuid=\"d38723c7-51f9-47a8-a436-7ff427d5b3cf\"/><clause displayName=\"numeratorExclusions\" isInGrouping=\"false\" type=\"numeratorExclusions\" uuid=\"ac192e54-1eac-4d0a-8278-e86f2f2c2c08\"/><clause displayName=\"denominatorExceptions\" isInGrouping=\"false\" type=\"denominatorExceptions\" uuid=\"7bc06ab6-2c48-4e0e-9cde-75e475d32c17\"/></group><group sequence=\"2\" ucum=\"\"><clause displayName=\"Initial Population 1\" isInGrouping=\"true\" type=\"initialPopulation\" uuid=\"6A94984B-CA0F-47DE-8120-86614BD3F282\"><cqldefinition displayName=\"ipp\" uuid=\"722989ff-72b4-4879-9da2-5d4bb2adf058\"/></clause><clause displayName=\"Denominator 1\" isInGrouping=\"true\" type=\"denominator\" uuid=\"266B238A-4E11-4478-B5F8-8BE58B9494FD\"><cqldefinition displayName=\"den\" uuid=\"201c282d-ea86-4f55-b527-d1aced6740ff\"/></clause><clause displayName=\"Numerator 1\" isInGrouping=\"true\" type=\"numerator\" uuid=\"9B041B70-2E4B-4166-BB3D-BCD987531AB5\"><cqldefinition displayName=\"num\" uuid=\"79f0d26f-6c3d-4489-b9f0-de5fce8ed003\"/></clause><clause displayName=\"Stratum 1\" type=\"stratum\" uuid=\"5BAA1DE4-4CB0-4944-9E68-AC65EEFD04B1\"><cqldefinition displayName=\"ipp\" uuid=\"722989ff-72b4-4879-9da2-5d4bb2adf058\"/></clause><clause displayName=\"denominatorExclusions\" isInGrouping=\"false\" type=\"denominatorExclusions\" uuid=\"9d5c9dcd-5940-4fc7-ac8f-8d2011d9daec\"/><clause displayName=\"numeratorExclusions\" isInGrouping=\"false\" type=\"numeratorExclusions\" uuid=\"0092cd8b-4a35-4811-ae1c-3c224a46387d\"/><clause displayName=\"denominatorExceptions\" isInGrouping=\"false\" type=\"denominatorExceptions\" uuid=\"015beace-3aeb-4ca7-bcf4-c2989243dd0c\"/></group></measureGrouping><elementLookUp><qdm code=\"false\" datatype=\"Patient Characteristic Payer\" id=\"a0869052-e161-49b1-9a96-674e7241a043\" isValidatedWithVsac=\"VALID\" name=\"Payer\" oid=\"2.16.840.1.114222.4.11.3591\" originalName=\"Payer\" program=\"\" release=\"\" suffix=\"\" suppDataElement=\"false\" taxonomy=\"Source of Payment Typology\" type=\"Extensional\" uuid=\"a0869052-e161-49b1-9a96-674e7241a043\" version=\"\"/><qdm code=\"false\" datatype=\"Patient Characteristic Sex\" id=\"dbd8e075-082f-4c8e-aeb9-458b34cfb55e\" isValidatedWithVsac=\"VALID\" name=\"ONC Administrative Sex\" oid=\"2.16.840.1.113762.1.4.1\" originalName=\"ONC Administrative Sex\" program=\"\" release=\"\" suffix=\"\" suppDataElement=\"false\" taxonomy=\"Administrative Sex\" type=\"Extensional\" uuid=\"dbd8e075-082f-4c8e-aeb9-458b34cfb55e\" version=\"\"/><qdm code=\"false\" datatype=\"Patient Characteristic Ethnicity\" id=\"99279307-7b56-424b-b92e-9c4a78b34ac1\" isValidatedWithVsac=\"VALID\" name=\"Ethnicity\" oid=\"2.16.840.1.114222.4.11.837\" originalName=\"Ethnicity\" program=\"\" release=\"\" suffix=\"\" suppDataElement=\"false\" taxonomy=\"CDC\" type=\"Extensional\" uuid=\"99279307-7b56-424b-b92e-9c4a78b34ac1\" version=\"\"/><qdm code=\"false\" datatype=\"Patient Characteristic Race\" id=\"0b7e0dba-9562-45ec-a82d-54c4959b5cae\" isValidatedWithVsac=\"VALID\" name=\"Race\" oid=\"2.16.840.1.114222.4.11.836\" originalName=\"Race\" program=\"\" release=\"\" suffix=\"\" suppDataElement=\"false\" taxonomy=\"CDC\" type=\"Extensional\" uuid=\"0b7e0dba-9562-45ec-a82d-54c4959b5cae\" version=\"\"/></elementLookUp><allUsedCQLLibs/><measureDetails><uuid>4028c4bc-888f-fa0a-0188-909cf79a0004</uuid><cqlUUID>31DB3CC9-8976-4CA2-9F36-38F6F0A108B2</cqlUUID><title>Qdm3</title><measureModel>QDM</measureModel><shortTitle>Qdm3</shortTitle><emeasureid>1177</emeasureid><guid>88d598ad-1108-4ac9-93f7-66838ef1bacb</guid><version>0.0.001</version><nqfid root=\"2.16.840.1.113883.3.560.1\"/><period calenderYear=\"false\" uuid=\"6a74a06f-077a-429b-b935-431de8221a5b\"><startDate>20230101</startDate><stopDate>20231208</stopDate></period><steward id=\"207\">SemanticBits</steward><experimental>false</experimental><populationBasis/><developers><developer id=\"02c84f54-919b-4464-bf51-a1438f2710e2\">SemanticBits</developer></developers><scoring id=\"PROPOR\">Proportion</scoring><patientBasedIndicator>true</patientBasedIndicator><measurePopulationExclusionsDescription/><qualityMeasureSet uuid=\"88d598ad-1108-4ac9-93f7-66838ef1bacb\"/></measureDetails></measure>"
+}
