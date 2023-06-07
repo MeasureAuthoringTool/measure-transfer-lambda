@@ -203,7 +203,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
     // convert MAT stratum to MADiE stratifications
     const stratifications = [
       ...group.clause
-        .filter((population: any) => population["@_type"] === "stratum")
+        .filter((population: any) => population["@_type"] === "stratum" && population["@_isInGrouping"] !== "false")
         .map((population: any) => {
           const stratDefine = population.cqldefinition["@_displayName"];
           const stratRefPop = group.clause.find(
