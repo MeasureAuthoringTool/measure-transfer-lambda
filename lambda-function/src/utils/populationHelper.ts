@@ -70,9 +70,9 @@ export const getPopulationsForScoring = (scoring: string): Population[] => {
       ];
       break;
     // not transferring group info for Continuous Variable scoring for now:
-    // case MeasureScoring.CONTINUOUS_VARIABLE:
-    //   populations = [initialPopulation, measurePopulation, measurePopulationExclusion];
-    //   break;
+    case MeasureScoring.CONTINUOUS_VARIABLE:
+      populations = [initialPopulation, measurePopulation, measurePopulationExclusion];
+      break;
     case MeasureScoring.RATIO:
       populations = [initialPopulation, denominator, denominatorExclusion, numerator, numeratorExclusion];
       break;

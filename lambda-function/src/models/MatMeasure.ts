@@ -115,4 +115,6 @@ export default interface MatMeasure {
   manageMeasureDetailModel: MeasureDetails;
   fhirMeasureResourceJson: string;
   fhirLibraryResourcesJson: string;
+  cql: string;
+  simpleXml: string;
 }
