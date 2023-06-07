@@ -126,6 +126,9 @@ describe("Unit test for lambda handler", () => {
     expect(measureToTransfer.supplementalData).toBeTruthy();
     expect(measureToTransfer.supplementalData.length).toEqual(4);
     expect(measureToTransfer.riskAdjustments).toBeFalsy();
+    const year = new Date().getFullYear();
+    expect(measureToTransfer.measurementPeriodStart).toEqual(`${year}-01-01T00:00:00.000Z`);
+    expect(measureToTransfer.measurementPeriodEnd).toEqual(`${year}-12-31T23:59:59.999Z`);
 
     expect(measureToTransfer.groups[0].scoring).toEqual("Continuous Variable");
     expect(measureToTransfer.groups[0].populations.length).toEqual(3);

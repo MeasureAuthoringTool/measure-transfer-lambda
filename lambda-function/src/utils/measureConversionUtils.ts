@@ -61,6 +61,18 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
       }
       if ((matProperty === "measFromPeriod" || matProperty === "measToPeriod") && value) {
         value = new Date(value).toISOString().split("T")[0].concat("T").concat(new Date().toISOString().split("T")[1]);
+      } else if (matProperty === "measFromPeriod") {
+        // default measurement period start to start of year
+        const start = new Date();
+        start.setUTCFullYear(start.getFullYear(), 0, 1);
+        start.setUTCHours(0, 0, 0, 0);
+        value = start.toISOString();
+      } else if (matProperty === "measToPeriod") {
+        // default measurement period end to end of year
+        const end = new Date();
+        end.setUTCFullYear(end.getFullYear(), 11, 31);
+        end.setUTCHours(23, 59, 59, 999);
+        value = end.toISOString();
       }
       return [madieProperty, value];
     })
