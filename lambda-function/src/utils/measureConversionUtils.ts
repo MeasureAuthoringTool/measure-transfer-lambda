@@ -207,13 +207,11 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
     const hasTwoIps =
       popsInGrouping?.filter((population: any) => population["@_type"] === "initialPopulation")?.length === 2;
 
-    console.log("populations:: ", JSON.stringify(hasTwoIps, null, 2));
-
     const determineAssociationType = (population: any): string | undefined => {
       let associationType = undefined;
-      const popType = popsInGrouping.find((popInGroup) => popInGroup["@_associatedPopulationUUID"] === population["@_uuid"])?.[
-        "@_type"
-      ];
+      const popType = popsInGrouping.find(
+        (popInGroup) => popInGroup["@_associatedPopulationUUID"] === population["@_uuid"],
+      )?.["@_type"];
       if ("NUMERATOR" === popType?.toUpperCase()) {
         associationType = "Numerator";
       } else if ("DENOMINATOR" === popType?.toUpperCase()) {
@@ -239,8 +237,6 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
       }) ?? [];
 
     const pops = getAllPopulations(allPopulations, populations);
-
-    console.log("populations to transfer::", JSON.stringify(pops, null, 2));
 
     // seems like a grouping in MAT can only have a single stratification, but that has multiple stratums
     // which does not align directly with stratification representation in MADiE...
