@@ -1,4 +1,5 @@
 import {
+  BaseConfigurationTypes,
   Endorsement,
   Group,
   Measure,
@@ -11,13 +12,16 @@ import {
   PopulationType,
   SupplementalData,
 } from "@madie/madie-models";
-import MatMeasure, { MeasureDetailResult, MeasureDetails, MeasureType } from "../models/MatMeasure";
+import MatMeasure, { MeasureDetails, MeasureType } from "../models/MatMeasure";
 import { getPopulationsForScoring } from "./populationHelper";
 import { randomUUID } from "crypto";
 import { MatMeasureType } from "../models/MatMeasureTypes";
 import { XMLParser } from "fast-xml-parser";
 import * as _ from "lodash";
 import { Stratification } from "@madie/madie-models/dist/Measure";
+// TODO: work out issue with loading ucum - typescript issue
+// @ts-ignore
+import * as ucum from "@lhncbc/ucum-lhc";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
 const MEASURE_PROPERTY_MAPPINGS = {
@@ -45,6 +49,10 @@ const POPULATION_CODE_MAPPINGS: { [key: string]: string } = {
   "measure-population": "measurePopulation",
   "measure-population-exclusion": "measurePopulationExclusion",
   "measure-observation": "measureObservation",
+};
+
+const getPopulationForQdmPopulationType = (qdmPop: string) => {
+  return qdmPop && qdmPop.endsWith("s") ? qdmPop.substring(0, qdmPop.length - 2) : qdmPop;
 };
 
 const CMS_IDENTIFIERR_SYSTEM = "http://hl7.org/fhir/cqi/ecqm/Measure/Identifier/cms";
@@ -162,28 +170,38 @@ export const isPopulation = (type: string): boolean => {
   return type !== "stratum" && type !== "measureObservation";
 };
 
+const determineAssociationType = (population: any, populationsInGrouping: any[]): string | undefined => {
+  let associationType = undefined;
+  const popType = populationsInGrouping.find(
+    (popInGroup) => popInGroup["@_associatedPopulationUUID"] === population["@_uuid"],
+  )?.["@_type"];
+  if ("NUMERATOR" === popType?.toUpperCase()) {
+    associationType = "Numerator";
+  } else if ("DENOMINATOR" === popType?.toUpperCase()) {
+    associationType = "Denominator";
+  }
+  return associationType;
+};
+
 export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: MeasureDetails) => {
   const parser = new XMLParser({ ignoreAttributes: false });
   const simpleMeasure = parser.parse(simpleXml);
-  const groups = simpleMeasure?.measure?.measureGrouping?.group;
-
-  const measureGroupTypes = measureDetails.measureTypeSelectedList
-    ? getMeasureTypes(measureDetails.measureTypeSelectedList)
-    : undefined;
+  const groups = valueAsArray(simpleMeasure?.measure?.measureGrouping?.group);
 
   const scoring: string = measureDetails.measScoring ?? MeasureScoring.COHORT;
   const allPopulations = getPopulationsForScoring(scoring);
 
   return groups?.map((group: any) => {
     const ucumUnits = group["@_ucum"];
+    const clauses = valueAsArray(group?.clause) ?? [];
 
-    const observations = group.clause
-      .filter((population: any) => population["@_type"] === "measureObservation")
-      .map((population: any) => {
+    const observations = clauses
+      ?.filter((population: any) => population["@_type"] === "measureObservation")
+      ?.map((population: any) => {
         const criteriaReference =
           scoring === MeasureScoring.RATIO
             ? population["@_associatedPopulationUUID"]
-            : group.clause.find(
+            : clauses?.find(
                 (searchPop: any) =>
                   searchPop["@_isInGrouping"] === "true" && searchPop["@_type"] === "measurePopulation",
               )?.["@_uuid"];
@@ -196,17 +214,27 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
         } as MeasureObservation;
       });
 
-    const populations = group.clause
-      .filter((population: any) => isPopulation(population["@_type"]) && population["@_isInGrouping"] === "true")
-      .map((population: any) => {
+    const popsInGrouping = clauses?.filter(
+      (population: any) => isPopulation(population["@_type"]) && population["@_isInGrouping"] === "true",
+    );
+    const hasTwoIps =
+      popsInGrouping?.filter((population: any) => population["@_type"] === "initialPopulation")?.length === 2;
+
+    const populations =
+      popsInGrouping?.map((population: any) => {
         const popType = population["@_type"];
+        const associationType =
+          hasTwoIps && population["@_type"] === "initialPopulation" && scoring === MeasureScoring.RATIO
+            ? determineAssociationType(population, popsInGrouping)
+            : undefined;
         return {
           id: population["@_uuid"],
-          name: popType,
+          name: getPopulationType(popType),
           definition: population.cqldefinition["@_displayName"],
           description: getPopulationDescription(popType, measureDetails),
+          associationType,
         } as Population;
-      });
+      }) ?? [];
 
     const pops = getAllPopulations(allPopulations, populations);
 
@@ -214,13 +242,11 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
     // which does not align directly with stratification representation in MADiE...
     // convert MAT stratum to MADiE stratifications
     const stratifications = [
-      ...group.clause
-        .filter((population: any) => population["@_type"] === "stratum" && population["@_isInGrouping"] !== "false")
-        .map((population: any) => {
+      ...clauses
+        ?.filter((population: any) => population["@_type"] === "stratum" && population["@_isInGrouping"] !== "false")
+        ?.map((population: any) => {
           const stratDefine = population.cqldefinition["@_displayName"];
-          const stratRefPop = group.clause.find(
-            (refPop: any) => refPop?.cqldefinition?.["@_displayName"] === stratDefine,
-          );
+          const stratRefPop = clauses.find((refPop: any) => refPop?.cqldefinition?.["@_displayName"] === stratDefine);
 
           return {
             cqlDefinition: stratDefine,
@@ -230,7 +256,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
           } as Stratification;
         }),
     ];
-
+    const scoringUnit = ucumCodeToOption(ucumUnits);
     return {
       id: undefined as unknown as string,
       scoring: measureDetails.measScoring,
@@ -240,9 +266,8 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
       groupDescription: undefined,
       rateAggregation: measureDetails.rateAggregation,
       improvementNotation: measureDetails.improvNotations,
-      scoringUnit: ucumUnits,
+      scoringUnit: !_.isEmpty(ucumUnits) ? scoringUnit : undefined,
       stratifications: _.isNil(stratifications) || _.isEmpty(stratifications) ? undefined : stratifications,
-      measureGroupTypes: measureGroupTypes,
       populationBasis: `${measureDetails.patientBased}`,
     } as Group;
   });
@@ -278,6 +303,25 @@ export const convertMeasureGroups = (measureResourceJson: string, measureDetails
   });
 };
 
+export const ucumCodeToOption = (ucumCode: string) => {
+  // somehow this loads ucum codes into memory and is required
+  ucum.UcumLhcUtils.getInstance();
+  const unitCodes = ucum.UnitTables.getInstance().unitCodes_;
+  const ucumUnit = unitCodes[ucumCode];
+  if (!_.isNil(ucumUnit)) {
+    return {
+      label: `${ucumUnit.csCode_} ${ucumUnit.name_}`,
+      value: {
+        code: ucumUnit.csCode_,
+        guidance: ucumUnit.guidance_,
+        name: ucumUnit.name_,
+        system: "https://clinicaltables.nlm.nih.gov/",
+      },
+    };
+  }
+  return undefined;
+};
+
 export const getPopulationType = (type: string): PopulationType => {
   switch (type) {
     case "initialPopulation":
@@ -285,16 +329,20 @@ export const getPopulationType = (type: string): PopulationType => {
     case "numerator":
       return PopulationType.NUMERATOR;
     case "numeratorExclusion":
+    case "numeratorExclusions":
       return PopulationType.NUMERATOR_EXCLUSION;
     case "denominator":
       return PopulationType.DENOMINATOR;
     case "denominatorExclusion":
+    case "denominatorExclusions":
       return PopulationType.DENOMINATOR_EXCLUSION;
     case "denominatorException":
+    case "denominatorExceptions":
       return PopulationType.DENOMINATOR_EXCEPTION;
     case "measurePopulation":
       return PopulationType.MEASURE_POPULATION;
     case "measurePopulationExclusion":
+    case "measurePopulationExclusions":
       return PopulationType.MEASURE_POPULATION_EXCLUSION;
     case "measureObservation":
       return PopulationType.MEASURE_OBSERVATION;
@@ -330,6 +378,47 @@ export const getMeasureTypes = (measuretypes: Array<MeasureType>): Array<Measure
     }
   });
   return types;
+};
+
+export const getBaseConfigurationTypes = (
+  measuretypes: Array<MeasureType> | undefined,
+): Array<BaseConfigurationTypes> => {
+  const types = new Set<BaseConfigurationTypes>();
+  measuretypes?.map((type) => {
+    switch (type.description) {
+      case MatMeasureType.PROCESS:
+        types.add(BaseConfigurationTypes.PROCESS);
+        break;
+      case MatMeasureType.APPROPRIATE_USE_PROCESS:
+        types.add(BaseConfigurationTypes.APPROPRIATE_USE_PROCESS);
+        break;
+      case MatMeasureType.STRUCTURE:
+        types.add(BaseConfigurationTypes.STRUCTURE);
+        break;
+      case MatMeasureType.COST_RESOURCE_USE:
+        types.add(BaseConfigurationTypes.COST_OR_RESOURCE_USE);
+        break;
+      case MatMeasureType.EFFICIENCY:
+        types.add(BaseConfigurationTypes.EFFICIENCY);
+        break;
+      case MatMeasureType.OUTCOME:
+        types.add(BaseConfigurationTypes.OUTCOME);
+        break;
+      case MatMeasureType.INTERMEDIATE_CLINICAL_OUTCOME:
+        types.add(BaseConfigurationTypes.INTERMEDIATE_CLINICAL_OUTCOME);
+        break;
+      case MatMeasureType.PATIENT_ENGAGEMENT_EXPERIENCE:
+        types.add(BaseConfigurationTypes.PATIENT_ENGAGEMENT_OR_EXPERIENCE);
+        break;
+      case MatMeasureType.PATIENT_REPORTED_OUTCOME_PERFORMANCE:
+        types.add(BaseConfigurationTypes.PATIENT_REPORTED_OUTCOME);
+        break;
+      default:
+        types.add(BaseConfigurationTypes.OUTCOME);
+        break;
+    }
+  });
+  return Array.from(types.values());
 };
 
 const addMeasureType = (measureTypes: Array<MeasureGroupTypes>, measureType: MeasureGroupTypes) => {
@@ -369,12 +458,27 @@ const getQdmMeasureLibraryNameAndCql = (matMeasure: MatMeasure): { cqlLibraryNam
   };
 };
 
+/**
+ * Takes a value that may be undefined, a single object, or an array, and returns undefined or an array
+ * If the input is undefined/null, undefined will be returned.
+ * If the input is a single object, then an array will be returned with that input object as the single child.
+ * Otherwise, the input array will be returned.
+ * @param value
+ */
+const valueAsArray = (value: any): any[] | undefined => {
+  let arr = undefined;
+  if (!_.isNil(value)) {
+    arr = _.isArray(value) ? value : [{ ...value }];
+  }
+  return arr;
+};
+
 const getSupplementalData = (matMeasure: MatMeasure): SupplementalData[] | undefined => {
   let supplementalData = undefined;
   if (matMeasure.manageMeasureDetailModel.measureModel === "QDM") {
     const parser = new XMLParser({ ignoreAttributes: false });
     const simpleMeasure = parser.parse(matMeasure.simpleXml);
-    supplementalData = simpleMeasure.measure?.supplementalDataElements?.cqldefinition?.map(
+    supplementalData = valueAsArray(simpleMeasure.measure?.supplementalDataElements?.cqldefinition)?.map(
       (sde: any) =>
         ({
           definition: sde["@_displayName"],
@@ -391,7 +495,7 @@ const getRiskAdjustments = (matMeasure: MatMeasure) => {
   if (matMeasure.manageMeasureDetailModel.measureModel === "QDM") {
     const parser = new XMLParser({ ignoreAttributes: false });
     const simpleMeasure = parser.parse(matMeasure.simpleXml);
-    riskAdjustments = simpleMeasure.measure?.riskAdjustmentVariables?.cqldefinition?.map(
+    riskAdjustments = valueAsArray(simpleMeasure.measure?.riskAdjustmentVariables?.cqldefinition)?.map(
       (rav: any) =>
         ({
           definition: rav["@_displayName"],
@@ -444,6 +548,14 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     lastModifiedBy: matMeasure.harpId,
     supplementalData: getSupplementalData(matMeasure),
     riskAdjustments: getRiskAdjustments(matMeasure),
+    supplementalDataDescription:
+      matMeasure.manageMeasureDetailModel.measureModel === "QDM" ? measureDetails.supplementalData : undefined,
+    riskAdjustmentDescription:
+      matMeasure.manageMeasureDetailModel.measureModel === "QDM" ? measureDetails.riskAdjustment : undefined,
+    baseConfigurationTypes:
+      matMeasure.manageMeasureDetailModel.measureModel === "QDM"
+        ? getBaseConfigurationTypes(measureDetails.measureTypeSelectedList)
+        : undefined,
     cmsId,
   } as Measure;
 
@@ -457,25 +569,24 @@ const buildVersion = (measureDetails: MeasureDetails) => {
 
 const getAllPopulations = (allPopulations: Population[], selectedPopulations: Population[]): Population[] => {
   const unselectedAndSelectedPopulations: Population[] = [];
+  const workingPopulations = [...selectedPopulations];
   allPopulations.forEach((population) => {
-    const tempPopulation = getSelected(population, selectedPopulations);
-    if (Object.keys(tempPopulation).length === 0) {
-      unselectedAndSelectedPopulations.push({ ...population, id: randomUUID() });
-    } else {
-      unselectedAndSelectedPopulations.push(tempPopulation);
-    }
+    let tempPopulation = getSelected(population, workingPopulations);
+    // handle multiple of any population type
+    do {
+      if (_.isNil(tempPopulation)) {
+        unselectedAndSelectedPopulations.push({ ...population, id: randomUUID() });
+      } else {
+        workingPopulations.splice(workingPopulations.indexOf(tempPopulation), 1);
+        unselectedAndSelectedPopulations.push(tempPopulation);
+      }
+    } while (!_.isNil((tempPopulation = getSelected(population, workingPopulations))));
   });
   return unselectedAndSelectedPopulations;
 };
 
-const getSelected = (population: Population, selectedPopulations: Population[]): Population => {
-  let selected: Population = {} as Population;
-  selectedPopulations.forEach((pop) => {
-    if (pop.name === population.name) {
-      selected = pop;
-    }
-  });
-  return selected;
+const getSelected = (population: Population, selectedPopulations: Population[]): Population | undefined => {
+  return selectedPopulations.find((pop) => pop.name === population.name);
 };
 
 const getCmsId = (measureResourceJson: string, measureDetails: MeasureDetails): string => {
