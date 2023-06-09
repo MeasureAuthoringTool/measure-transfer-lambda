@@ -478,11 +478,6 @@ const getSupplementalData = (matMeasure: MatMeasure): SupplementalData[] | undef
   if (matMeasure.manageMeasureDetailModel.measureModel === "QDM") {
     const parser = new XMLParser({ ignoreAttributes: false });
     const simpleMeasure = parser.parse(matMeasure.simpleXml);
-    // let sdes = simpleMeasure.measure?.supplementalDataElements?.cqldefinition;
-    // if (!_.isNil(sdes) && !_.isArray(sdes)) {
-    //   sdes = [{ ...sdes }];
-    // }
-    // supplementalData = sdes?.map(
     supplementalData = valueAsArray(simpleMeasure.measure?.supplementalDataElements?.cqldefinition)?.map(
       (sde: any) =>
         ({
@@ -500,11 +495,6 @@ const getRiskAdjustments = (matMeasure: MatMeasure) => {
   if (matMeasure.manageMeasureDetailModel.measureModel === "QDM") {
     const parser = new XMLParser({ ignoreAttributes: false });
     const simpleMeasure = parser.parse(matMeasure.simpleXml);
-    // let ravs = simpleMeasure.measure?.riskAdjustmentVariables?.cqldefinition;
-    // if (!_.isNil(ravs) && !_.isArray(ravs)) {
-    //   ravs = [{ ...ravs }];
-    // }
-    // riskAdjustments = ravs?.map(
     riskAdjustments = valueAsArray(simpleMeasure.measure?.riskAdjustmentVariables?.cqldefinition)?.map(
       (rav: any) =>
         ({
