@@ -170,6 +170,19 @@ export const isPopulation = (type: string): boolean => {
   return type !== "stratum" && type !== "measureObservation";
 };
 
+const determineAssociationType = (population: any, populationsInGrouping: any[]): string | undefined => {
+  let associationType = undefined;
+  const popType = populationsInGrouping.find(
+    (popInGroup) => popInGroup["@_associatedPopulationUUID"] === population["@_uuid"],
+  )?.["@_type"];
+  if ("NUMERATOR" === popType?.toUpperCase()) {
+    associationType = "Numerator";
+  } else if ("DENOMINATOR" === popType?.toUpperCase()) {
+    associationType = "Denominator";
+  }
+  return associationType;
+};
+
 export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: MeasureDetails) => {
   const parser = new XMLParser({ ignoreAttributes: false });
   const simpleMeasure = parser.parse(simpleXml);
@@ -207,25 +220,12 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
     const hasTwoIps =
       popsInGrouping?.filter((population: any) => population["@_type"] === "initialPopulation")?.length === 2;
 
-    const determineAssociationType = (population: any): string | undefined => {
-      let associationType = undefined;
-      const popType = popsInGrouping.find(
-        (popInGroup) => popInGroup["@_associatedPopulationUUID"] === population["@_uuid"],
-      )?.["@_type"];
-      if ("NUMERATOR" === popType?.toUpperCase()) {
-        associationType = "Numerator";
-      } else if ("DENOMINATOR" === popType?.toUpperCase()) {
-        associationType = "Denominator";
-      }
-      return associationType;
-    };
-
     const populations =
       popsInGrouping?.map((population: any) => {
         const popType = population["@_type"];
         const associationType =
           hasTwoIps && population["@_type"] === "initialPopulation" && scoring === MeasureScoring.RATIO
-            ? determineAssociationType(population)
+            ? determineAssociationType(population, popsInGrouping)
             : undefined;
         return {
           id: population["@_uuid"],
