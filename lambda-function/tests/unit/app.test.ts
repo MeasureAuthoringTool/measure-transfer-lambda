@@ -10,6 +10,7 @@ import matDefaultMeasure from "./fixtures/measure_default.json";
 import putEvent from "./fixtures/s3PutEvent.json";
 import matQdmCvMeasure from "./fixtures/measure_qdm.json";
 import matQdmProportionMeasure from "./fixtures/measure_qdm_proportion.json";
+import ucumUnitsMeasure from "./fixtures/measure_ucum_units.json";
 import matQdmRatioMeasure from "./fixtures/measure_qdm_ratio.json";
 import axios from "axios";
 import { Measure, Model, PopulationType } from "@madie/madie-models";
@@ -285,5 +286,33 @@ describe("Unit test for lambda handler", () => {
     expect(madieMeasureTypes[1]).toBe("Structure");
     expect(madieMeasureTypes[2]).toBe("Outcome");
     expect(madieMeasureTypes[3]).toBe("Patient Reported Outcome");
+  });
+
+  it("should transfer ucum units and Reporting content", () => {
+    const expectedScoringUnitForCriteria1 = {
+      label: "g/kg  gram per kilogram",
+      value: {
+        code: "g/kg ",
+        guidance: null,
+        name: "gram per kilogram",
+        system: "https://clinicaltables.nlm.nih.gov/",
+      },
+    };
+    const expectedScoringUnitForCriteria2 = {
+      label: "ng/(24.h) nanogram per 24 hour",
+      value: {
+        code: "ng/(24.h)",
+        guidance: null,
+        name: "nanogram per 24 hour",
+        system: "https://clinicaltables.nlm.nih.gov/",
+      },
+    };
+    const madieMeasure = convertToMadieMeasure(ucumUnitsMeasure);
+    expect(madieMeasure.groups?.length).toBe(3);
+    expect(madieMeasure.groups[0].scoringUnit).toStrictEqual(expectedScoringUnitForCriteria1);
+    expect(madieMeasure.groups[1].scoringUnit).toStrictEqual(expectedScoringUnitForCriteria2);
+
+    expect(madieMeasure.rateAggregation).toBe("This is Example of RA");
+    expect(madieMeasure.improvementNotation).toBe("Increased score indicates improvement");
   });
 });
