@@ -195,6 +195,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
     const ucumUnits = group["@_ucum"];
     const clauses = valueAsArray(group?.clause) ?? [];
 
+    const scoringUnit = ucumCodeToOption(ucumUnits);
     const observations = clauses
       ?.filter((population: any) => population["@_type"] === "measureObservation")
       ?.map((population: any) => {
@@ -256,7 +257,6 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
           } as Stratification;
         }),
     ];
-    const scoringUnit = ucumCodeToOption(ucumUnits);
     return {
       id: undefined as unknown as string,
       scoring: measureDetails.measScoring,
@@ -264,9 +264,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
       populations: pops,
       measureObservations: _.isNil(observations) || _.isEmpty(observations) ? null : observations,
       groupDescription: undefined,
-      rateAggregation: measureDetails.rateAggregation,
-      improvementNotation: measureDetails.improvNotations,
-      scoringUnit: !_.isEmpty(ucumUnits) ? scoringUnit : undefined,
+      scoringUnit: !_.isEmpty(scoringUnit) ? scoringUnit : undefined,
       stratifications: _.isNil(stratifications) || _.isEmpty(stratifications) ? undefined : stratifications,
       populationBasis: `${measureDetails.patientBased}`,
     } as Group;
@@ -303,11 +301,12 @@ export const convertMeasureGroups = (measureResourceJson: string, measureDetails
   });
 };
 
-export const ucumCodeToOption = (ucumCode: string) => {
+export const ucumCodeToOption = (matUcumCode: string) => {
   // somehow this loads ucum codes into memory and is required
   ucum.UcumLhcUtils.getInstance();
-  const unitCodes = ucum.UnitTables.getInstance().unitCodes_;
-  const ucumUnit = unitCodes[ucumCode];
+  let allUnitCodes = ucum.UnitTables.getInstance().unitCodes_;
+  allUnitCodes = _.mapKeys(allUnitCodes, (value, key) => _.trim(key));
+  const ucumUnit = allUnitCodes[matUcumCode];
   if (!_.isNil(ucumUnit)) {
     return {
       label: `${ucumUnit.csCode_} ${ucumUnit.name_}`,
@@ -518,48 +517,42 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
   const measureProperties: any = convertMeasureProperties(measureDetails);
   // convert metadata properties
   const measureMetaData = convertMeasureMetadata(measureDetails);
+
+  const isQDM = matMeasure.manageMeasureDetailModel?.measureModel === "QDM";
   // convert groups
-  const measureGroups =
-    matMeasure.manageMeasureDetailModel.measureModel === "QDM"
-      ? convertQdmMeasureGroups(matMeasure.simpleXml, measureDetails)
-      : convertMeasureGroups(matMeasure.fhirMeasureResourceJson, measureDetails);
+  const measureGroups = isQDM
+    ? convertQdmMeasureGroups(matMeasure.simpleXml, measureDetails)
+    : convertMeasureGroups(matMeasure.fhirMeasureResourceJson, measureDetails);
 
   // get measure library name and cql
-  const { cqlLibraryName, cql } =
-    matMeasure.manageMeasureDetailModel.measureModel === "QDM"
-      ? getQdmMeasureLibraryNameAndCql(matMeasure)
-      : getMeasureLibraryNameAndCql(matMeasure);
+  const { cqlLibraryName, cql } = isQDM
+    ? getQdmMeasureLibraryNameAndCql(matMeasure)
+    : getMeasureLibraryNameAndCql(matMeasure);
 
-  const cmsId =
-    matMeasure.manageMeasureDetailModel.measureModel === "QDM"
-      ? matMeasure.manageMeasureDetailModel.eMeasureId
-      : getCmsId(matMeasure.fhirMeasureResourceJson, measureDetails);
+  const cmsId = isQDM
+    ? matMeasure.manageMeasureDetailModel.eMeasureId
+    : getCmsId(matMeasure.fhirMeasureResourceJson, measureDetails);
 
-  const madieMeasure = {
+  return {
     ...measureProperties,
     active: true,
     measureMetaData: measureMetaData,
     groups: measureGroups,
     cql: cql,
-    scoring: matMeasure.manageMeasureDetailModel.measureModel === "QDM" ? measureProperties.measureScoring : undefined,
+    scoring: isQDM ? measureProperties.measureScoring : undefined,
     version: buildVersion(measureDetails),
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
     lastModifiedBy: matMeasure.harpId,
     supplementalData: getSupplementalData(matMeasure),
     riskAdjustments: getRiskAdjustments(matMeasure),
-    supplementalDataDescription:
-      matMeasure.manageMeasureDetailModel.measureModel === "QDM" ? measureDetails.supplementalData : undefined,
-    riskAdjustmentDescription:
-      matMeasure.manageMeasureDetailModel.measureModel === "QDM" ? measureDetails.riskAdjustment : undefined,
-    baseConfigurationTypes:
-      matMeasure.manageMeasureDetailModel.measureModel === "QDM"
-        ? getBaseConfigurationTypes(measureDetails.measureTypeSelectedList)
-        : undefined,
+    rateAggregation: isQDM ? matMeasure.manageMeasureDetailModel.rateAggregation : undefined,
+    improvementNotation: isQDM ? matMeasure.manageMeasureDetailModel.improvNotations : undefined,
+    supplementalDataDescription: isQDM ? measureDetails.supplementalData : undefined,
+    riskAdjustmentDescription: isQDM ? measureDetails.riskAdjustment : undefined,
+    baseConfigurationTypes: isQDM ? getBaseConfigurationTypes(measureDetails.measureTypeSelectedList) : undefined,
     cmsId,
   } as Measure;
-
-  return madieMeasure;
 };
 
 const buildVersion = (measureDetails: MeasureDetails) => {

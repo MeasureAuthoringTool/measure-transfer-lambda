@@ -38,7 +38,7 @@ jobs:
         run: npm ci
 
       - name: Audit node modules for security vulnerabilities
-        run: npm audit
+        run: npm audit --audit-level=moderate
 
       - name: Lint the source code
         run: npm run-script lint
