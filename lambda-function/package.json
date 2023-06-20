@@ -10,7 +10,8 @@
     "lint": "eslint '*.ts' --quiet --fix",
     "prettier": "prettier --check \"src/**/*.{js,ts}\"",
     "compile": "tsc",
-    "test": "npm run compile && npm run unit"
+    "test": "npm run compile && npm run unit",
+    "audit": "npm audit --audit-level=high"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
