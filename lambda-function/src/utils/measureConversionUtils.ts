@@ -37,6 +37,8 @@ const MEASURE_PROPERTY_MAPPINGS = {
   patientBased: "patientBasis",
   id: "versionId",
   shortName: "ecqmTitle",
+  supplementalData: "supplementalDataDescription",
+  riskAdjustment: "riskAdjustmentDescription",
 };
 
 const POPULATION_CODE_MAPPINGS: { [key: string]: string } = {
@@ -120,11 +122,9 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
     clinicalRecommendation: measureDetails.clinicalRecomms,
     references: references,
     endorsements: [endorsement],
-    riskAdjustment: measureDetails.riskAdjustment,
     definition: measureDetails.definitions,
     experimental: measureDetails.experimental,
     transmissionFormat: measureDetails.transmissionFormat,
-    supplementalDataElements: measureDetails.supplementalData,
     // TODO: keep adding new metadata fields as we support them in MADiE
   };
 };
@@ -548,8 +548,8 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     riskAdjustments: getRiskAdjustments(matMeasure),
     rateAggregation: isQDM ? matMeasure.manageMeasureDetailModel.rateAggregation : undefined,
     improvementNotation: isQDM ? matMeasure.manageMeasureDetailModel.improvNotations : undefined,
-    supplementalDataDescription: isQDM ? measureDetails.supplementalData : undefined,
-    riskAdjustmentDescription: isQDM ? measureDetails.riskAdjustment : undefined,
+    supplementalDataDescription: measureDetails.supplementalData,
+    riskAdjustmentDescription: measureDetails.riskAdjustment,
     baseConfigurationTypes: isQDM ? getBaseConfigurationTypes(measureDetails.measureTypeSelectedList) : undefined,
     cmsId,
   } as Measure;
