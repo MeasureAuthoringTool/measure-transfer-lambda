@@ -15,15 +15,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v2
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '20'
 
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-node-modules
         with:
@@ -38,7 +38,7 @@ jobs:
         run: npm ci
 
       - name: Audit node modules for security vulnerabilities
-        run: npm audit --audit-level=moderate
+        run: npm audit --audit-level=high
 
       - name: Lint the source code
         run: npm run-script lint
@@ -50,13 +50,13 @@ jobs:
         run: npm run-script test
 
       - name: Store the coverage report as an artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage/lcov.info
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           file: coverage/lcov.info
           fail_ci_if_error: true
