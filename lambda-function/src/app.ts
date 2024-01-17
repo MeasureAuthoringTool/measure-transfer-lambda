@@ -7,6 +7,7 @@ import MatMeasure from "./models/MatMeasure";
 import { convertToMadieMeasure } from "./utils/measureConversionUtils";
 import { Measure } from "@madie/madie-models";
 import { MeasureServiceApi } from "./api/MeasureServiceApi";
+import MailService from "./utils/mailservice";
 
 import { MADiE_SERVICE_URL, MADiE_API_KEY } from "./configs/configs";
 
@@ -29,6 +30,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     Key: key,
   };
   let madieMeasure: Measure = {} as Measure;
+  let emailId: string = "gregory.akins@icf.com";
   try {
     const { Body } = await s3Client.send(new GetObjectCommand(params));
     const bodyContents = await streamToString(Body as Readable);
@@ -53,6 +55,9 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     return response;
   } catch (error: any) {
     // TODO: error email notification
+    const mailService: MailService = new MailService();
+    console.log("Lambda Transfer Failed....");
+    const result = mailService.sendMail(emailId, error.message);
     console.error(error.message);
 
     return madieMeasure;

@@ -29,7 +29,7 @@ const MEASURE_PROPERTY_MAPPINGS = {
   draft: "state",
   measureName: "measureName",
   cqlLibraryName: "cqlLibraryName",
-  measScoring: "measureScoring",
+  measScoring: "scoring",
   fhir: "model",
   measFromPeriod: "measurementPeriodStart",
   measToPeriod: "measurementPeriodEnd",
@@ -410,7 +410,7 @@ export const getBaseConfigurationTypes = (
         types.add(BaseConfigurationTypes.PATIENT_ENGAGEMENT_OR_EXPERIENCE);
         break;
       case MatMeasureType.PATIENT_REPORTED_OUTCOME_PERFORMANCE:
-        types.add(BaseConfigurationTypes.PATIENT_REPORTED_OUTCOME);
+        types.add(BaseConfigurationTypes.PATIENT_REPORTED_OUTCOME_PERFORMANCE);
         break;
       default:
         types.add(BaseConfigurationTypes.OUTCOME);
@@ -539,7 +539,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     measureMetaData: measureMetaData,
     groups: measureGroups,
     cql: cql,
-    scoring: isQDM ? measureProperties.measureScoring : undefined,
+    scoring: isQDM ? measureProperties.scoring : undefined,
     version: buildVersion(measureDetails),
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
