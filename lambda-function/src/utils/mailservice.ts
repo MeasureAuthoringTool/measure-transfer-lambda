@@ -16,15 +16,22 @@ export class MailService {
       },
     });
     console.log("######## Transport Created");
-
-    const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
-      from:FROM_EMAIL, // sender address
-      to: "gregory.akins@icf.com", // list of receivers
-      subject: "A problem occurred importing a Measure to MADiE", // Subject line
-      text: message, // plain text body
-    });
-    console.log("######## Message Sent", info);
-    return info;
+    console.log(`######## Sending email from "${FROM_EMAIL}" with message "${message}"`);
+    try {
+      const info:SMTPTransport.SentMessageInfo = await transporter.sendMail({
+        from: FROM_EMAIL, // sender address
+        to: "gregory.akins@icf.com", // list of receivers
+        subject: "A problem occurred importing a Measure to MADiE", // Subject line
+        text: message, // plain text body
+      });
+      console.log("######## Message Sent", info);
+      return info ;
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("######## Send Email failed", error.message);      
+      }
+      throw error ;
+    }    
   }
 }
 

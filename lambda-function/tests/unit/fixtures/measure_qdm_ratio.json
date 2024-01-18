@@ -30,7 +30,7 @@
     "referencesList": [],
     "authorSelectedList": [],
     "stewardSelectedList": null,
-    "measureTypeSelectedList": [],
+    "measureTypeSelectedList": [{"description":"Process"}],
     "qdsSelectedList": null,
     "componentMeasuresSelectedList": null,
     "toCompareAuthor": null,

@@ -7,8 +7,11 @@ import matProportionMeasure from "./fixtures/measure_proportion.json";
 import matCVMeasure from "./fixtures/measure_continuousVariable.json";
 import matRatioMeasure from "./fixtures/measure_ratio.json";
 import matDefaultMeasure from "./fixtures/measure_default.json";
+import matMeasureNoCmsId from "./fixtures/measure_noCmsId.json";
 import putEvent from "./fixtures/s3PutEvent.json";
 import matQdmCvMeasure from "./fixtures/measure_qdm.json";
+import matQdmDefaults from "./fixtures/measure_qdm_defaults.json";
+import matQdmCvMeasureDefaultBaseConfigurationType from "./fixtures/measure_qdm_defaultBaseConfigurationType.json";
 import matQdmProportionMeasure from "./fixtures/measure_qdm_proportion.json";
 import ucumUnitsMeasure from "./fixtures/measure_ucum_units.json";
 import matQdmRatioMeasure from "./fixtures/measure_qdm_ratio.json";
@@ -29,7 +32,6 @@ import MailService from "../../src/utils/mailservice";
 
 jest.mock("axios");
 const mockedAxios = axios as jest.Mocked<typeof axios>;
-
 jest.mock("@aws-sdk/client-s3");
 const mockS3Client = s3Client as jest.Mocked<typeof s3Client>;
 
@@ -55,7 +57,7 @@ describe("Unit test for lambda handler", () => {
 
   it("reads s3 object and transfer it over to MADiE successfully", async () => {
     const measureToTransfer = convertToMadieMeasure(matMeasure as unknown as MatMeasure);
-    mockedAxios.put.mockResolvedValue({ data: measureToTransfer });
+    mockedAxios.post.mockResolvedValue({ data: measureToTransfer });
 
     mockS3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream } as never);
 
@@ -73,6 +75,9 @@ describe("Unit test for lambda handler", () => {
     expect(madieMeasure.measureMetaData?.developers).toMatchObject([{ name: "Able Health" }, { name: "SemanticBits" }]);
     expect(madieMeasure.supplementalDataDescription).toEqual(matMeasure.manageMeasureDetailModel.supplementalData);
     expect(madieMeasure.riskAdjustmentDescription).toEqual(matMeasure.manageMeasureDetailModel.riskAdjustment);
+
+    expect(mockS3Client.send).toHaveBeenCalled();
+    expect(mockedAxios.post).toHaveBeenCalled();
   });
 
   it("test proportion measure group and populations", () => {
@@ -93,6 +98,21 @@ describe("Unit test for lambda handler", () => {
     const measureToTransfer = convertToMadieMeasure(matRatioMeasure as unknown as MatMeasure);
     expect(measureToTransfer.groups?.length).toBe(1);
     expect(measureToTransfer.groups?.[0]?.populations?.length).toBe(5);
+  });
+
+  it("test find default CMS Id on measure", () => {
+    const measureToTransfer = convertToMadieMeasure(matMeasureNoCmsId as unknown as MatMeasure);
+    expect(measureToTransfer.cmsId).toEqual("1175FHIR");
+    
+  });
+
+  // it("test find QDM defaults on QDMmeasure", () => {
+  //   const measureToTransfer = convertToMadieMeasure(matQdmDefaults as unknown as MatMeasure);
+  //   expect(measureToTransfer.groups?.[0].scoring).toEqual("Cohort");
+  // });
+
+  it("test find FHIR defaults on FHIR measure", () => {
+    const measureToTransfer = convertToMadieMeasure(matDefaultMeasure as unknown as MatMeasure);    
   });
 
   it("test default measure group and populations", () => {
@@ -151,10 +171,42 @@ describe("Unit test for lambda handler", () => {
     const year = new Date().getFullYear();
     expect(measureToTransfer.measurementPeriodStart).toEqual(`${year}-01-01T00:00:00.000Z`);
     expect(measureToTransfer.measurementPeriodEnd).toEqual(`${year}-12-31T23:59:59.999Z`);
+    expect(measureToTransfer.groups?.[0]?.scoring).toEqual("Continuous Variable");
+    expect(measureToTransfer.groups?.[0]?.populations?.length).toEqual(3);
+    expect(measureToTransfer.groups?.[0]?.measureObservations?.length).toEqual(1);
+    expect(measureToTransfer?.baseConfigurationTypes.length).toEqual(9);
+    expect(measureToTransfer?.baseConfigurationTypes?.[0]).toEqual("Process");
+    const g1Obs1CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[0]?.criteriaReference;
+    expect(g1Obs1CriteriaRef).toBeTruthy();
+    // referenced population should exist!
+    const g1Obs1RefPop = measureToTransfer?.groups?.[0]?.populations?.find((pop) => pop.id === g1Obs1CriteriaRef);
+    expect(g1Obs1RefPop).toBeTruthy();
+  });
+
+  it("test QDM CV measure conversion with default BaseConfigurationType", () => {
+    const measureToTransfer = convertToMadieMeasure(
+      matQdmCvMeasureDefaultBaseConfigurationType as unknown as MatMeasure,
+    );
+    expect(measureToTransfer).toBeTruthy();
+    expect(measureToTransfer.measureName).toEqual("ObsTestTransfer");
+    expect(measureToTransfer.cqlLibraryName).toEqual("CMS1175");
+    expect(measureToTransfer.scoring).toEqual("Continuous Variable");
+    expect(measureToTransfer.patientBasis).toEqual(false);
+    expect(measureToTransfer.model).toEqual("QDM v5.6");
+    expect(measureToTransfer.groups).toBeTruthy();
+    expect(measureToTransfer.groups?.length).toEqual(3);
+    expect(measureToTransfer.supplementalData).toBeTruthy();
+    expect(measureToTransfer.supplementalData?.length).toEqual(4);
+    expect(measureToTransfer.riskAdjustments).toBeFalsy();
+    const year = new Date().getFullYear();
+    expect(measureToTransfer.measurementPeriodStart).toEqual(`${year}-01-01T00:00:00.000Z`);
+    expect(measureToTransfer.measurementPeriodEnd).toEqual(`${year}-12-31T23:59:59.999Z`);
 
     expect(measureToTransfer.groups?.[0]?.scoring).toEqual("Continuous Variable");
     expect(measureToTransfer.groups?.[0]?.populations?.length).toEqual(3);
     expect(measureToTransfer.groups?.[0]?.measureObservations?.length).toEqual(1);
+    expect(measureToTransfer?.baseConfigurationTypes.length).toEqual(1);
+    expect(measureToTransfer?.baseConfigurationTypes?.[0]).toEqual("Outcome");
     const g1Obs1CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[0]?.criteriaReference;
     expect(g1Obs1CriteriaRef).toBeTruthy();
     // referenced population should exist!

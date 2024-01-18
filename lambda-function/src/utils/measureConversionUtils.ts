@@ -53,10 +53,6 @@ const POPULATION_CODE_MAPPINGS: { [key: string]: string } = {
   "measure-observation": "measureObservation",
 };
 
-const getPopulationForQdmPopulationType = (qdmPop: string) => {
-  return qdmPop && qdmPop.endsWith("s") ? qdmPop.substring(0, qdmPop.length - 2) : qdmPop;
-};
-
 const CMS_IDENTIFIERR_SYSTEM = "http://hl7.org/fhir/cqi/ecqm/Measure/Identifier/cms";
 
 // transform measure level properties
@@ -191,7 +187,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
   const scoring: string = measureDetails.measScoring ?? MeasureScoring.COHORT;
   const allPopulations = getPopulationsForScoring(scoring);
 
-  return groups?.map((group: any) => {
+  const resultGroups = groups?.map((group: any) => {
     const ucumUnits = group["@_ucum"];
     const clauses = valueAsArray(group?.clause) ?? [];
 
@@ -257,9 +253,9 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
           } as Stratification;
         }),
     ];
-    return {
+    const result:Group =  {
       id: undefined as unknown as string,
-      scoring: measureDetails.measScoring,
+      scoring: scoring, //measureDetails.measScoring,
       // populations: getAllPopulations(allPopulations, populations),
       populations: pops,
       measureObservations: _.isNil(observations) || _.isEmpty(observations) ? null : observations,
@@ -268,7 +264,11 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
       stratifications: _.isNil(stratifications) || _.isEmpty(stratifications) ? undefined : stratifications,
       populationBasis: `${measureDetails.patientBased}`,
     } as Group;
+
+    return result;
   });
+  
+  return resultGroups;
 };
 
 // convert MAT measure groups to MADiE measure groups
@@ -587,7 +587,7 @@ const getCmsId = (measureResourceJson: string, measureDetails: MeasureDetails): 
   const identifiers = measureResource.identifier;
   let cmsIdentifier = identifiers?.find((identifier: any) => identifier.system === CMS_IDENTIFIERR_SYSTEM)?.value;
   if (!cmsIdentifier && measureDetails.eMeasureId !== 0) {
-    cmsIdentifier = measureDetails.eMeasureId + "FHIR";
+      cmsIdentifier = measureDetails.eMeasureId + "FHIR";
   }
   return cmsIdentifier;
 };
