@@ -6,7 +6,7 @@ export class MailService {
   constructor() {}
 
   async sendMail(emailId: string, message: string): Promise<SMTPTransport.SentMessageInfo> {
-    var transporter = NodeMailer.createTransport({
+    var transporter = await NodeMailer.createTransport({
       host: SMTP_HOSTNAME,
       port: Number(SMTP_PORT) || 0, // SMTP PORT
       secure: Boolean(SMTP_TLS) || false, // true for 465, false for other ports
