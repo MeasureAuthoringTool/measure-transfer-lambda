@@ -20,7 +20,7 @@ export class MailService {
       },
     });
 
-    var x = await transporter.verify(function(error, success) {
+     transporter.verify(function(error, success) {
       if (error) {
         console.log(error);
       } else {
