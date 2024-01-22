@@ -29,7 +29,7 @@ const MEASURE_PROPERTY_MAPPINGS = {
   draft: "state",
   measureName: "measureName",
   cqlLibraryName: "cqlLibraryName",
-  measScoring: "measureScoring",
+  measScoring: "scoring",
   fhir: "model",
   measFromPeriod: "measurementPeriodStart",
   measToPeriod: "measurementPeriodEnd",
@@ -51,10 +51,6 @@ const POPULATION_CODE_MAPPINGS: { [key: string]: string } = {
   "measure-population": "measurePopulation",
   "measure-population-exclusion": "measurePopulationExclusion",
   "measure-observation": "measureObservation",
-};
-
-const getPopulationForQdmPopulationType = (qdmPop: string) => {
-  return qdmPop && qdmPop.endsWith("s") ? qdmPop.substring(0, qdmPop.length - 2) : qdmPop;
 };
 
 const CMS_IDENTIFIERR_SYSTEM = "http://hl7.org/fhir/cqi/ecqm/Measure/Identifier/cms";
@@ -191,7 +187,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
   const scoring: string = measureDetails.measScoring ?? MeasureScoring.COHORT;
   const allPopulations = getPopulationsForScoring(scoring);
 
-  return groups?.map((group: any) => {
+  const resultGroups = groups?.map((group: any) => {
     const ucumUnits = group["@_ucum"];
     const clauses = valueAsArray(group?.clause) ?? [];
 
@@ -257,7 +253,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
           } as Stratification;
         }),
     ];
-    return {
+    const result: Group = {
       id: undefined as unknown as string,
       scoring: measureDetails.measScoring,
       // populations: getAllPopulations(allPopulations, populations),
@@ -268,7 +264,9 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
       stratifications: _.isNil(stratifications) || _.isEmpty(stratifications) ? undefined : stratifications,
       populationBasis: `${measureDetails.patientBased}`,
     } as Group;
+    return result;
   });
+  return resultGroups;
 };
 
 // convert MAT measure groups to MADiE measure groups
@@ -410,7 +408,7 @@ export const getBaseConfigurationTypes = (
         types.add(BaseConfigurationTypes.PATIENT_ENGAGEMENT_OR_EXPERIENCE);
         break;
       case MatMeasureType.PATIENT_REPORTED_OUTCOME_PERFORMANCE:
-        types.add(BaseConfigurationTypes.PATIENT_REPORTED_OUTCOME);
+        types.add(BaseConfigurationTypes.PATIENT_REPORTED_OUTCOME_PERFORMANCE);
         break;
       default:
         types.add(BaseConfigurationTypes.OUTCOME);
@@ -539,7 +537,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     measureMetaData: measureMetaData,
     groups: measureGroups,
     cql: cql,
-    scoring: isQDM ? measureProperties.measureScoring : undefined,
+    scoring: isQDM ? measureProperties.scoring : undefined,
     version: buildVersion(measureDetails),
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,

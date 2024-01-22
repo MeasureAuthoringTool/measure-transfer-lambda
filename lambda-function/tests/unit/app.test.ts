@@ -7,13 +7,18 @@ import matProportionMeasure from "./fixtures/measure_proportion.json";
 import matCVMeasure from "./fixtures/measure_continuousVariable.json";
 import matRatioMeasure from "./fixtures/measure_ratio.json";
 import matDefaultMeasure from "./fixtures/measure_default.json";
+import matMeasureNoCmsId from "./fixtures/measure_noCmsId.json";
 import putEvent from "./fixtures/s3PutEvent.json";
 import matQdmCvMeasure from "./fixtures/measure_qdm.json";
+import matQdmDefaults from "./fixtures/measure_qdm_defaults.json";
+import matQdmCvMeasureDefaultBaseConfigurationType from "./fixtures/measure_qdm_defaultBaseConfigurationType.json";
 import matQdmProportionMeasure from "./fixtures/measure_qdm_proportion.json";
 import ucumUnitsMeasure from "./fixtures/measure_ucum_units.json";
 import matQdmRatioMeasure from "./fixtures/measure_qdm_ratio.json";
 import axios from "axios";
+import MatMeasure from "../../src/models/MatMeasure";
 import { Measure, Model, PopulationType } from "@madie/madie-models";
+
 import {
   convertToMadieMeasure,
   convertMeasureGroups,
@@ -23,9 +28,20 @@ import {
 } from "../../src/utils/measureConversionUtils";
 import { MeasureDetails } from "../../src/models/MatMeasure";
 
-jest.mock("axios");
+import MailService from "../../src/utils/mailservice";
 
+jest.mock("axios");
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 jest.mock("@aws-sdk/client-s3");
+const mockS3Client = s3Client as jest.Mocked<typeof s3Client>;
+
+jest.mock("../../src/utils/mailservice");
+const mailServiceMock = MailService as jest.Mock<MailService>;
+const mailServiceMockResolved = {
+  sendMail: jest.fn().mockResolvedValue(() => {
+    return null;
+  }),
+} as unknown as MailService;
 
 describe("Unit test for lambda handler", () => {
   let event: S3Event;
@@ -40,54 +56,73 @@ describe("Unit test for lambda handler", () => {
   });
 
   it("reads s3 object and transfer it over to MADiE successfully", async () => {
-    const measureToTransfer = convertToMadieMeasure(matMeasure);
-    axios.post.mockResolvedValue({ data: measureToTransfer });
+    const measureToTransfer = convertToMadieMeasure(matMeasure as unknown as MatMeasure);
+    mockedAxios.post.mockResolvedValue({ data: measureToTransfer });
 
-    s3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream });
+    mockS3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream } as never);
 
     const madieMeasure: Measure = await lambdaHandler(event);
     expect(madieMeasure.measureName).toEqual(matMeasure.manageMeasureDetailModel.measureName);
     expect(madieMeasure.version).toEqual("0.0.1");
     expect(madieMeasure.cqlLibraryName).toEqual(matMeasure.manageMeasureDetailModel.cqllibraryName);
-    expect(madieMeasure.measureScoring).toEqual(matMeasure.manageMeasureDetailModel.measScoring);
+    expect(madieMeasure.scoring).toBeUndefined();
     expect(madieMeasure.model).toEqual(Model.QICORE);
     expect(madieMeasure.createdBy).toEqual(matMeasure.harpId);
     expect(madieMeasure).toHaveProperty("cql");
     expect(madieMeasure.cql).toContain("using QICore version '4.1.1'");
-    expect(madieMeasure.measureMetaData.steward).toMatchObject({ name: "SemanticBits" });
-    expect(madieMeasure.measureMetaData.developers).toMatchObject([{ name: "Able Health" }, { name: "SemanticBits" }]);
+    expect(madieMeasure?.groups?.[0]?.scoring).toEqual("Cohort");
+    expect(madieMeasure.measureMetaData?.steward).toMatchObject({ name: "SemanticBits" });
+    expect(madieMeasure.measureMetaData?.developers).toMatchObject([{ name: "Able Health" }, { name: "SemanticBits" }]);
     expect(madieMeasure.supplementalDataDescription).toEqual(matMeasure.manageMeasureDetailModel.supplementalData);
     expect(madieMeasure.riskAdjustmentDescription).toEqual(matMeasure.manageMeasureDetailModel.riskAdjustment);
+
+    expect(mockS3Client.send).toHaveBeenCalled();
+    expect(mockedAxios.post).toHaveBeenCalled();
   });
 
   it("test proportion measure group and populations", () => {
-    const measureToTransfer = convertToMadieMeasure(matProportionMeasure);
+    const measureToTransfer = convertToMadieMeasure(matProportionMeasure as unknown as MatMeasure);
     expect(measureToTransfer.groups?.length).toBe(1);
-    expect(measureToTransfer.groups[0].populations?.length).toBe(6);
+    expect(measureToTransfer.groups?.[0]?.populations?.length).toBe(6);
     // make sure optional population id is not empty
-    expect(measureToTransfer.groups[0].populations[2].name).toBe("denominatorExclusion");
-    expect(measureToTransfer.groups[0].populations[2].id).not.toBe("");
+    expect(measureToTransfer?.groups?.[0]?.populations?.[2]?.name).toBe("denominatorExclusion");
+    expect(measureToTransfer?.groups?.[0]?.populations?.[2]?.id).not.toBe("");
   });
 
   it("test continuous variable measure group and populations", () => {
-    const measureToTransfer = convertToMadieMeasure(matCVMeasure);
+    const measureToTransfer = convertToMadieMeasure(matCVMeasure as unknown as MatMeasure);
     expect(measureToTransfer.groups?.length).toBe(0);
   });
 
   it("test ratio measure group and populations", () => {
-    const measureToTransfer = convertToMadieMeasure(matRatioMeasure);
+    const measureToTransfer = convertToMadieMeasure(matRatioMeasure as unknown as MatMeasure);
     expect(measureToTransfer.groups?.length).toBe(1);
-    expect(measureToTransfer.groups[0].populations?.length).toBe(5);
+    expect(measureToTransfer.groups?.[0]?.populations?.length).toBe(5);
+  });
+
+  it("test find default CMS Id on measure", () => {
+    const measureToTransfer = convertToMadieMeasure(matMeasureNoCmsId as unknown as MatMeasure);
+    expect(measureToTransfer.cmsId).toEqual("1175FHIR");
+  });
+
+  it("test find QDM defaults on QDMmeasure", () => {
+    const measureToTransfer = convertToMadieMeasure(matQdmDefaults as unknown as MatMeasure);
+    expect(measureToTransfer.groups?.[0].scoring).toBeUndefined();
+  });
+
+  it("test find FHIR defaults on FHIR measure", () => {
+    const measureToTransfer = convertToMadieMeasure(matDefaultMeasure as unknown as MatMeasure);
+    expect(measureToTransfer.scoring).toBeUndefined();
   });
 
   it("test default measure group and populations", () => {
-    const measureToTransfer = convertToMadieMeasure(matDefaultMeasure);
+    const measureToTransfer = convertToMadieMeasure(matDefaultMeasure as unknown as MatMeasure);
     expect(measureToTransfer.groups?.length).toBe(2);
-    expect(measureToTransfer.groups[0].populations?.length).toBe(0);
+    expect(measureToTransfer.groups?.[0]?.populations?.length).toBe(0);
   });
 
   it("test QDM ratio measure conversion", () => {
-    const measureToTransfer = convertToMadieMeasure(matQdmRatioMeasure);
+    const measureToTransfer = convertToMadieMeasure(matQdmRatioMeasure as unknown as MatMeasure);
     expect(measureToTransfer).toBeTruthy();
     expect(measureToTransfer.measureName).toEqual("Qdm4");
     expect(measureToTransfer.cqlLibraryName).toEqual("CMS1179");
@@ -95,19 +130,19 @@ describe("Unit test for lambda handler", () => {
     expect(measureToTransfer.patientBasis).toEqual(true);
     expect(measureToTransfer.model).toEqual("QDM v5.6");
     expect(measureToTransfer.groups).toBeTruthy();
-    expect(measureToTransfer.groups.length).toEqual(2);
+    expect(measureToTransfer.groups?.length).toEqual(2);
     expect(measureToTransfer.supplementalData).toBeTruthy();
-    expect(measureToTransfer.supplementalData.length).toEqual(4);
+    expect(measureToTransfer.supplementalData?.length).toEqual(4);
     expect(measureToTransfer.riskAdjustments).toBeTruthy();
-    expect(measureToTransfer.riskAdjustments.length).toEqual(2);
+    expect(measureToTransfer.riskAdjustments?.length).toEqual(2);
 
-    expect(measureToTransfer.groups[0].scoring).toEqual("Ratio");
-    expect(measureToTransfer.groups[0].populations.length).toEqual(6); // two ips!
-    expect(measureToTransfer.groups[0].populations[0].definition).toEqual("ipp");
-    expect(measureToTransfer.groups[0].populations[0].associationType).toEqual("Denominator");
-    expect(measureToTransfer.groups[0].populations[1].definition).toEqual("ipp2");
-    expect(measureToTransfer.groups[0].populations[1].associationType).toEqual("Numerator");
-    expect(measureToTransfer.groups[0].measureObservations.length).toEqual(2);
+    expect(measureToTransfer.groups?.[0]?.scoring).toEqual("Ratio");
+    expect(measureToTransfer.groups?.[0]?.populations?.length).toEqual(6); // two ips!
+    expect(measureToTransfer.groups?.[0]?.populations?.[0]?.definition).toEqual("ipp");
+    expect(measureToTransfer.groups?.[0]?.populations?.[0]?.associationType).toEqual("Denominator");
+    expect(measureToTransfer.groups?.[0]?.populations?.[1]?.definition).toEqual("ipp2");
+    expect(measureToTransfer.groups?.[0]?.populations?.[1]?.associationType).toEqual("Numerator");
+    expect(measureToTransfer.groups?.[0]?.measureObservations?.length).toEqual(2);
     const g1Obs1CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[0]?.criteriaReference;
     expect(g1Obs1CriteriaRef).toBeTruthy();
     // referenced population should exist!
@@ -121,7 +156,7 @@ describe("Unit test for lambda handler", () => {
   });
 
   it("test QDM CV measure conversion", () => {
-    const measureToTransfer = convertToMadieMeasure(matQdmCvMeasure);
+    const measureToTransfer = convertToMadieMeasure(matQdmCvMeasure as unknown as MatMeasure);
     expect(measureToTransfer).toBeTruthy();
     expect(measureToTransfer.measureName).toEqual("ObsTestTransfer");
     expect(measureToTransfer.cqlLibraryName).toEqual("CMS1175");
@@ -129,17 +164,49 @@ describe("Unit test for lambda handler", () => {
     expect(measureToTransfer.patientBasis).toEqual(false);
     expect(measureToTransfer.model).toEqual("QDM v5.6");
     expect(measureToTransfer.groups).toBeTruthy();
-    expect(measureToTransfer.groups.length).toEqual(3);
+    expect(measureToTransfer.groups?.length).toEqual(3);
     expect(measureToTransfer.supplementalData).toBeTruthy();
-    expect(measureToTransfer.supplementalData.length).toEqual(4);
+    expect(measureToTransfer.supplementalData?.length).toEqual(4);
+    expect(measureToTransfer.riskAdjustments).toBeFalsy();
+    const year = new Date().getFullYear();
+    expect(measureToTransfer.measurementPeriodStart).toEqual(`${year}-01-01T00:00:00.000Z`);
+    expect(measureToTransfer.measurementPeriodEnd).toEqual(`${year}-12-31T23:59:59.999Z`);
+    expect(measureToTransfer.groups?.[0]?.scoring).toEqual("Continuous Variable");
+    expect(measureToTransfer.groups?.[0]?.populations?.length).toEqual(3);
+    expect(measureToTransfer.groups?.[0]?.measureObservations?.length).toEqual(1);
+    expect(measureToTransfer?.baseConfigurationTypes.length).toEqual(9);
+    expect(measureToTransfer?.baseConfigurationTypes?.[0]).toEqual("Process");
+    const g1Obs1CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[0]?.criteriaReference;
+    expect(g1Obs1CriteriaRef).toBeTruthy();
+    // referenced population should exist!
+    const g1Obs1RefPop = measureToTransfer?.groups?.[0]?.populations?.find((pop) => pop.id === g1Obs1CriteriaRef);
+    expect(g1Obs1RefPop).toBeTruthy();
+  });
+
+  it("test QDM CV measure conversion with default BaseConfigurationType", () => {
+    const measureToTransfer = convertToMadieMeasure(
+      matQdmCvMeasureDefaultBaseConfigurationType as unknown as MatMeasure,
+    );
+    expect(measureToTransfer).toBeTruthy();
+    expect(measureToTransfer.measureName).toEqual("ObsTestTransfer");
+    expect(measureToTransfer.cqlLibraryName).toEqual("CMS1175");
+    expect(measureToTransfer.scoring).toEqual("Continuous Variable");
+    expect(measureToTransfer.patientBasis).toEqual(false);
+    expect(measureToTransfer.model).toEqual("QDM v5.6");
+    expect(measureToTransfer.groups).toBeTruthy();
+    expect(measureToTransfer.groups?.length).toEqual(3);
+    expect(measureToTransfer.supplementalData).toBeTruthy();
+    expect(measureToTransfer.supplementalData?.length).toEqual(4);
     expect(measureToTransfer.riskAdjustments).toBeFalsy();
     const year = new Date().getFullYear();
     expect(measureToTransfer.measurementPeriodStart).toEqual(`${year}-01-01T00:00:00.000Z`);
     expect(measureToTransfer.measurementPeriodEnd).toEqual(`${year}-12-31T23:59:59.999Z`);
 
-    expect(measureToTransfer.groups[0].scoring).toEqual("Continuous Variable");
-    expect(measureToTransfer.groups[0].populations.length).toEqual(3);
-    expect(measureToTransfer.groups[0].measureObservations.length).toEqual(1);
+    expect(measureToTransfer.groups?.[0]?.scoring).toEqual("Continuous Variable");
+    expect(measureToTransfer.groups?.[0]?.populations?.length).toEqual(3);
+    expect(measureToTransfer.groups?.[0]?.measureObservations?.length).toEqual(1);
+    expect(measureToTransfer?.baseConfigurationTypes.length).toEqual(1);
+    expect(measureToTransfer?.baseConfigurationTypes?.[0]).toEqual("Outcome");
     const g1Obs1CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[0]?.criteriaReference;
     expect(g1Obs1CriteriaRef).toBeTruthy();
     // referenced population should exist!
@@ -148,7 +215,7 @@ describe("Unit test for lambda handler", () => {
   });
 
   it("test QDM Proportion measure conversion", () => {
-    const measureToTransfer = convertToMadieMeasure(matQdmProportionMeasure);
+    const measureToTransfer = convertToMadieMeasure(matQdmProportionMeasure as unknown as MatMeasure);
     expect(measureToTransfer).toBeTruthy();
     expect(measureToTransfer.measureName).toEqual("Qdm3");
     expect(measureToTransfer.cqlLibraryName).toEqual("CMS1177");
@@ -156,56 +223,78 @@ describe("Unit test for lambda handler", () => {
     expect(measureToTransfer.patientBasis).toEqual(true);
     expect(measureToTransfer.model).toEqual("QDM v5.6");
     expect(measureToTransfer.groups).toBeTruthy();
-    expect(measureToTransfer.groups.length).toEqual(2);
+    expect(measureToTransfer.groups?.length).toEqual(2);
     expect(measureToTransfer.supplementalData).toBeTruthy();
-    expect(measureToTransfer.supplementalData.length).toEqual(4);
+    expect(measureToTransfer.supplementalData?.length).toEqual(4);
     expect(measureToTransfer.riskAdjustments).toBeFalsy();
 
-    expect(measureToTransfer.groups[0].scoring).toEqual("Proportion");
-    expect(measureToTransfer.groups[0].populations.length).toEqual(6);
-    expect(measureToTransfer.groups[0].measureObservations).toBeFalsy();
-    expect(measureToTransfer.groups[0].stratifications).toBeTruthy();
-    expect(measureToTransfer.groups[0].stratifications.length).toEqual(2);
+    expect(measureToTransfer.groups?.[0]?.scoring).toEqual("Proportion");
+    expect(measureToTransfer.groups?.[0]?.populations?.length).toEqual(6);
+    expect(measureToTransfer.groups?.[0]?.measureObservations).toBeFalsy();
+    expect(measureToTransfer.groups?.[0]?.stratifications).toBeTruthy();
+    expect(measureToTransfer.groups?.[0]?.stratifications?.length).toEqual(2);
     // expect(measureToTransfer.groups[0].stratifications[0]).toEqual(1);
   });
 
   it("handles validation errors from MADiE service", async () => {
-    s3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream });
+    mockS3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream } as never);
 
-    axios.post.mockRejectedValueOnce({
+    mockedAxios.post.mockRejectedValueOnce({
       status: 400,
       response: { data: "Duplicate library error" },
     });
 
     try {
       await lambdaHandler(event);
-    } catch (exception) {
-      expect(exception.message).toEqual('"Duplicate library error"');
+    } catch (error: any) {
+      if (error instanceof Error) {
+        expect(error.message).toEqual('"Duplicate library error"');
+      }
     }
   });
 
   it("handles s3 exception if any", async () => {
-    s3Client.send.mockImplementation(() => {
+    mockS3Client.send.mockImplementation(() => {
       throw new Error("Connection error");
     });
 
     try {
       await lambdaHandler(event);
-    } catch (exception) {
-      expect(exception.message).toEqual("Connection error");
+    } catch (error) {
+      if (error instanceof Error) {
+        expect(error.message).toEqual("Connection error");
+      }
     }
   });
 
   it("throws convert error", () => {
     try {
-      convertToMadieMeasure("");
+      convertToMadieMeasure("" as unknown as MatMeasure);
     } catch (error) {
-      expect(error.message).toBe("Empty Measure");
+      if (error instanceof Error) {
+        expect(error.message).toBe("Empty Measure");
+      }
+    }
+  });
+
+  it("throws convert error and calls email service", () => {
+    mailServiceMock.mockImplementation(() => {
+      return mailServiceMockResolved;
+    });
+    try {
+      convertToMadieMeasure("" as unknown as MatMeasure);
+    } catch (error) {
+      if (error instanceof Error) {
+        expect(error.message).toBe("Empty Measure");
+        const mailService: MailService = new MailService();
+        mailService.sendMail("name@example.com", "error message");
+        expect(MailService).toHaveBeenCalledTimes(1);
+      }
     }
   });
 
   it("empty groups", () => {
-    const madieMeasureGroup = convertMeasureGroups("", null, "");
+    const madieMeasureGroup = convertMeasureGroups("", null as unknown as MeasureDetails);
     expect(madieMeasureGroup.length).toBe(0);
   });
 
@@ -309,10 +398,10 @@ describe("Unit test for lambda handler", () => {
         system: "https://clinicaltables.nlm.nih.gov/",
       },
     };
-    const madieMeasure = convertToMadieMeasure(ucumUnitsMeasure);
-    expect(madieMeasure.groups?.length).toBe(3);
-    expect(madieMeasure.groups[0].scoringUnit).toStrictEqual(expectedScoringUnitForCriteria1);
-    expect(madieMeasure.groups[1].scoringUnit).toStrictEqual(expectedScoringUnitForCriteria2);
+    const madieMeasure = convertToMadieMeasure(ucumUnitsMeasure as unknown as MatMeasure);
+    expect(madieMeasure?.groups?.length).toBe(3);
+    expect(madieMeasure.groups?.[0]?.scoringUnit).toStrictEqual(expectedScoringUnitForCriteria1);
+    expect(madieMeasure.groups?.[1]?.scoringUnit).toStrictEqual(expectedScoringUnitForCriteria2);
 
     expect(madieMeasure.rateAggregation).toBe("This is Example of RA");
     expect(madieMeasure.improvementNotation).toBe("Increased score indicates improvement");
