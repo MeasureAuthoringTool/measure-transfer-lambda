@@ -20,6 +20,12 @@ import { MADiE_SERVICE_URL, MADiE_API_KEY } from "./configs/configs";
  *
  */
 export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
+  let emailMessage: string = "";
+  const logAndMail = (message: string) => {
+    console.log(message);
+    emailMessage += `${message}\n`;
+  };
+
   console.log("Lambda handler started.....");
   const bucket: string = event.Records[0].s3.bucket.name;
   const key: string = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, " "));
@@ -31,33 +37,36 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
   };
   let madieMeasure: Measure = {} as Measure;
   let emailId: string = "gregory.akins@icf.com";
+  const mailService: MailService = new MailService();
   try {
     const { Body } = await s3Client.send(new GetObjectCommand(params));
     const bodyContents = await streamToString(Body as Readable);
     const matMeasure: MatMeasure = JSON.parse(bodyContents);
-    console.log("--------MAT Measure Details-------");
-    console.log(`User: ${matMeasure.harpId}`);
-    console.log(`Measure id: ${matMeasure?.manageMeasureDetailModel.id}`);
-    console.log(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
-    console.log(`Measure version: ${matMeasure?.manageMeasureDetailModel.versionNumber}`);
-    console.log(`Measure revisionNumber: ${matMeasure?.manageMeasureDetailModel.revisionNumber}`);
-    console.log(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel.cqllibraryName}`);
-    console.log(`CMS ID: ${matMeasure?.manageMeasureDetailModel.eMeasureId}`);
-    console.log("Converting measure from MAT to MADiE format");
+    logAndMail("--------MAT Measure Details-------");
+    logAndMail(`User: ${matMeasure.harpId}`);
+    logAndMail(`Measure id: ${matMeasure?.manageMeasureDetailModel.id}`);
+    logAndMail(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
+    logAndMail(`Measure version: ${matMeasure?.manageMeasureDetailModel.versionNumber}`);
+    logAndMail(`Measure revisionNumber: ${matMeasure?.manageMeasureDetailModel.revisionNumber}`);
+    logAndMail(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel.cqllibraryName}`);
+    logAndMail(`CMS ID: ${matMeasure?.manageMeasureDetailModel.eMeasureId}`);
+    logAndMail("Converting measure from MAT to MADiE format");
     madieMeasure = convertToMadieMeasure(matMeasure);
-    console.log("Transferring measure over to MADiE");
+    logAndMail("Transferring measure over to MADiE");
     const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
       madieMeasure,
       matMeasure.harpId,
     );
-    console.log("Transferred Measure id: ", response.id);
+    logAndMail(`Transferred Measure id: ${response.id}`);
     console.log("Lambda execution completed...");
+    const result = await mailService.sendMail(emailId, emailMessage);
     return response;
   } catch (error: any) {
     // TODO: error email notification
-    const mailService: MailService = new MailService();
+
     console.log("Lambda Transfer Failed....sending email");
-    const result = await mailService.sendMail(emailId, error.message);
+    logAndMail(error.message);
+    const result = await mailService.sendMail(emailId, emailMessage);
     console.error(`Lambda Transfer Failed because ${error.message}`);
 
     return madieMeasure;

@@ -6,7 +6,7 @@ export class MailService {
   constructor() {}
 
   async sendMail(emailId: string, message: string): Promise<SMTPTransport.SentMessageInfo> {
-    var transporter = await NodeMailer.createTransport({
+    var transporter: NodeMailer.Transporter<SMTPTransport.SentMessageInfo> = await NodeMailer.createTransport({
       host: SMTP_HOSTNAME,
       port: Number(SMTP_PORT) || 0, // SMTP PORT
       secure: Boolean(SMTP_TLS) || false, // true for 465, false for other ports
@@ -22,18 +22,19 @@ export class MailService {
 
     console.log("######## Transport Created", transporter);
     console.log(`######## Sending email from "${FROM_EMAIL}" with message "${message}"`);
-    transporter.verify(function (error, success) {
+    await transporter.verify(function (error, success) {
       if (error) {
-        console.log(error);
+        console.log("Error establishing SMTPTransport", error);
       } else {
         console.log("Mail relay is ready to take our messages");
       }
     });
+
     try {
       const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
         from: FROM_EMAIL, // sender address
         to: "gregory.akins@icf.com, brendan.donohue@icf.com", // list of receivers
-        subject: "A problem occurred importing a Measure to MADiE", // Subject line
+        subject: "Result of importing a Measure to MADiE", // Subject line
         text: message, // plain text body
       });
       console.log("######## Message Sent", info);

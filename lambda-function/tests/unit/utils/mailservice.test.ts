@@ -2,10 +2,8 @@ import MailService from "../../../src/utils/mailservice";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 jest.mock("nodemailer");
-jest.mock("nodemailer/lib/smtp-transport");
 
 const nodemailer = require("nodemailer"); //doesn't work with import. idk why
-const smtpTransport = require("nodemailer/lib/smtp-transport");
 
 describe("SMTP test", () => {
   beforeEach(() => {
@@ -23,26 +21,21 @@ describe("SMTP test", () => {
     expect(sendMailMock).toHaveBeenCalled();
   });
 
-  it.skip("Calls SMTPClient, transporter verify returns an error", async () => {
-    jest.spyOn(nodemailer, "sendMail").mockImplementation(() => {});
-
-    nodemailer.createTransport.mockReturnValue();
-
-    const mailService: MailService = new MailService();
-    const info: SMTPTransport.SentMessageInfo = await mailService.sendMail("dev@example.com", "Error Message");
-    expect(info).toBeDefined();
-  });
-
   it("Calls SMTPClient and throws and error", async () => {
-    const sendMailMock = jest.fn().mockRejectedValue(new Error());
+    const sendMailMock = jest.fn().mockRejectedValue(new Error("Error Message"));
 
-    nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
+    nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock, verify: () => {} });
     const mailService: MailService = new MailService();
     try {
-      expect(await mailService.sendMail("dev@example.com", "Error Message")).rejects.toThrow(Error);
-      //expect(true).toBeTruthy();
+      await mailService.sendMail("dev@example.com", "Error Message");
+      fail("Shouldn't have made it here");
     } catch (error) {
-      console.log("###### Catching an error during test");
+      expect(error).not.toBeUndefined();
+      if (error instanceof Error) {
+        expect(error.message).toEqual("Error Message");
+      } else {
+        fail("Error isn't the right type");
+      }
     }
   });
 });
