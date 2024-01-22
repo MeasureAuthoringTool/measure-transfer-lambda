@@ -1,9 +1,11 @@
 import MailService from "../../../src/utils/mailservice";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
-import NodeMailer from "nodemailer";
 
 jest.mock("nodemailer");
+jest.mock("nodemailer/lib/smtp-transport");
+
 const nodemailer = require("nodemailer"); //doesn't work with import. idk why
+const smtpTransport = require("nodemailer/lib/smtp-transport");
 
 describe("SMTP test", () => {
   beforeEach(() => {
@@ -12,13 +14,23 @@ describe("SMTP test", () => {
   it("Calls SMTPClient", async () => {
     const sendMailMock = jest.fn().mockReturnValue({ someObjectProperty: 42 }); //we're not inspecting the response, so the mock return doesn't matter
 
-    nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock });
+    nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock, verify: () => {} });
 
     const mailService: MailService = new MailService();
     const info: SMTPTransport.SentMessageInfo = await mailService.sendMail("dev@example.com", "Error Message");
     expect(info).toBeDefined();
 
     expect(sendMailMock).toHaveBeenCalled();
+  });
+
+  it.skip("Calls SMTPClient, transporter verify returns an error", async () => {
+    jest.spyOn(nodemailer, "sendMail").mockImplementation(() => {});
+
+    nodemailer.createTransport.mockReturnValue();
+
+    const mailService: MailService = new MailService();
+    const info: SMTPTransport.SentMessageInfo = await mailService.sendMail("dev@example.com", "Error Message");
+    expect(info).toBeDefined();
   });
 
   it("Calls SMTPClient and throws and error", async () => {

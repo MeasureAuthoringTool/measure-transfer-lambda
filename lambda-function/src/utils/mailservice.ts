@@ -22,11 +22,11 @@ export class MailService {
 
     console.log("######## Transport Created", transporter);
     console.log(`######## Sending email from "${FROM_EMAIL}" with message "${message}"`);
-     transporter.verify(function(error, success) {
+    transporter.verify(function (error, success) {
       if (error) {
         console.log(error);
       } else {
-        console.log('Mail relay is ready to take our messages');
+        console.log("Mail relay is ready to take our messages");
       }
     });
     try {
@@ -42,7 +42,7 @@ export class MailService {
       if (error instanceof Error) {
         console.log("######## Send Email failed", error.message);
       }
-      throw error ;
+      throw error;
     }
   }
 }
