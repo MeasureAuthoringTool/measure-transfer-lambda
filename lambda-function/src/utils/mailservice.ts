@@ -6,7 +6,7 @@ export class MailService {
   constructor() {}
 
   async sendMail(emailId: string, message: string): Promise<SMTPTransport.SentMessageInfo> {
-    var transporter = NodeMailer.createTransport({
+    var transporter = await NodeMailer.createTransport({
       host: SMTP_HOSTNAME,
       port: Number(SMTP_PORT) || 0, // SMTP PORT
       secure: Boolean(SMTP_TLS) || false, // true for 465, false for other ports
@@ -15,23 +15,23 @@ export class MailService {
         pass: SMTP_PASSWORD,
       },
     });
-    console.log("######## Transport Created");
+    console.log("######## Transport Created", transporter);
     console.log(`######## Sending email from "${FROM_EMAIL}" with message "${message}"`);
     try {
-      const info:SMTPTransport.SentMessageInfo = await transporter.sendMail({
+      const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
         from: FROM_EMAIL, // sender address
         to: "gregory.akins@icf.com", // list of receivers
         subject: "A problem occurred importing a Measure to MADiE", // Subject line
         text: message, // plain text body
       });
       console.log("######## Message Sent", info);
-      return info ;
+      return info;
     } catch (error) {
       if (error instanceof Error) {
-        console.log("######## Send Email failed", error.message);      
+        console.log("######## Send Email failed", error.message);
       }
-      throw error ;
-    }    
+      throw error;
+    }
   }
 }
 

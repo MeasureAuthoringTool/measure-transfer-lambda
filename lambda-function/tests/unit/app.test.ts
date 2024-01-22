@@ -103,16 +103,16 @@ describe("Unit test for lambda handler", () => {
   it("test find default CMS Id on measure", () => {
     const measureToTransfer = convertToMadieMeasure(matMeasureNoCmsId as unknown as MatMeasure);
     expect(measureToTransfer.cmsId).toEqual("1175FHIR");
-    
   });
 
-  // it("test find QDM defaults on QDMmeasure", () => {
-  //   const measureToTransfer = convertToMadieMeasure(matQdmDefaults as unknown as MatMeasure);
-  //   expect(measureToTransfer.groups?.[0].scoring).toEqual("Cohort");
-  // });
+  it("test find QDM defaults on QDMmeasure", () => {
+    const measureToTransfer = convertToMadieMeasure(matQdmDefaults as unknown as MatMeasure);
+    expect(measureToTransfer.groups?.[0].scoring).toBeUndefined();
+  });
 
   it("test find FHIR defaults on FHIR measure", () => {
-    const measureToTransfer = convertToMadieMeasure(matDefaultMeasure as unknown as MatMeasure);    
+    const measureToTransfer = convertToMadieMeasure(matDefaultMeasure as unknown as MatMeasure);
+    expect(measureToTransfer.scoring).toBeUndefined();
   });
 
   it("test default measure group and populations", () => {

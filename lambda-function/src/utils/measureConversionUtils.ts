@@ -253,9 +253,9 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
           } as Stratification;
         }),
     ];
-    const result:Group =  {
+    const result: Group = {
       id: undefined as unknown as string,
-      scoring: scoring, //measureDetails.measScoring,
+      scoring: measureDetails.measScoring,
       // populations: getAllPopulations(allPopulations, populations),
       populations: pops,
       measureObservations: _.isNil(observations) || _.isEmpty(observations) ? null : observations,
@@ -264,10 +264,8 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
       stratifications: _.isNil(stratifications) || _.isEmpty(stratifications) ? undefined : stratifications,
       populationBasis: `${measureDetails.patientBased}`,
     } as Group;
-
     return result;
   });
-  
   return resultGroups;
 };
 
@@ -587,7 +585,7 @@ const getCmsId = (measureResourceJson: string, measureDetails: MeasureDetails): 
   const identifiers = measureResource.identifier;
   let cmsIdentifier = identifiers?.find((identifier: any) => identifier.system === CMS_IDENTIFIERR_SYSTEM)?.value;
   if (!cmsIdentifier && measureDetails.eMeasureId !== 0) {
-      cmsIdentifier = measureDetails.eMeasureId + "FHIR";
+    cmsIdentifier = measureDetails.eMeasureId + "FHIR";
   }
   return cmsIdentifier;
 };
