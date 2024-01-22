@@ -1,6 +1,7 @@
 import NodeMailer from "nodemailer";
 import { FROM_EMAIL, SMTP_HOSTNAME, SMTP_PASSWORD, SMTP_PORT, SMTP_TLS, SMTP_USERNAME } from "../configs/configs";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
+import { title } from "process";
 
 export class MailService {
   constructor() {}
@@ -34,7 +35,7 @@ export class MailService {
       const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
         from: FROM_EMAIL, // sender address
         to: "gregory.akins@icf.com, brendan.donohue@icf.com", // list of receivers
-        subject: "Result of importing a Measure to MADiE", // Subject line
+        subject:title, // Subject line
         text: message, // plain text body
       });
       console.log("######## Message Sent", info);
