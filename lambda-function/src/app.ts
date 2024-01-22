@@ -57,7 +57,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     // TODO: error email notification
     const mailService: MailService = new MailService();
     console.log("Lambda Transfer Failed....sending email");
-    const result = mailService.sendMail(emailId, error.message);
+    const result = await mailService.sendMail(emailId, error.message);
     console.error(`Lambda Transfer Failed because ${error.message}`);
 
     return madieMeasure;

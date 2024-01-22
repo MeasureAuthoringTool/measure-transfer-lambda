@@ -14,13 +14,25 @@ export class MailService {
         user: SMTP_USERNAME,
         pass: SMTP_PASSWORD,
       },
+      tls: {
+        // do not fail on invalid certs
+        rejectUnauthorized: false,
+      },
     });
+
     console.log("######## Transport Created", transporter);
     console.log(`######## Sending email from "${FROM_EMAIL}" with message "${message}"`);
+     transporter.verify(function(error, success) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Mail relay is ready to take our messages');
+      }
+    });
     try {
       const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
         from: FROM_EMAIL, // sender address
-        to: "gregory.akins@icf.com", // list of receivers
+        to: "gregory.akins@icf.com, brendan.donohue@icf.com", // list of receivers
         subject: "A problem occurred importing a Measure to MADiE", // Subject line
         text: message, // plain text body
       });
@@ -30,7 +42,7 @@ export class MailService {
       if (error instanceof Error) {
         console.log("######## Send Email failed", error.message);
       }
-      throw error;
+      throw error ;
     }
   }
 }
