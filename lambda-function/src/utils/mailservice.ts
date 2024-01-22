@@ -1,7 +1,6 @@
 import NodeMailer from "nodemailer";
 import { FROM_EMAIL, SMTP_HOSTNAME, SMTP_PASSWORD, SMTP_PORT, SMTP_TLS, SMTP_USERNAME } from "../configs/configs";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
-import { title } from "process";
 
 export class MailService {
   constructor() {}

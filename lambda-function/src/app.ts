@@ -23,7 +23,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
   let emailMessage: string = "";
   const logAndMail = (message: string) => {
     console.log(message);
-    emailMessage += `${message}\n`;
+    emailMessage = `${emailMessage}${message}\n`;
   };
 
   console.log("Lambda handler started.....");
@@ -64,7 +64,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
   } catch (error: any) {
     console.log("Lambda Transfer Failed....sending email");
     logAndMail(error.message);
-    console.log(`Mailing the message ${emailMessage}`);
+    console.log(`Mailing the error message ${emailMessage}`);
     const result = await mailService.sendMail(emailId, "Failed to import the measure", emailMessage);
     console.error(`Lambda Transfer Failed because ${error.message}`);
 
