@@ -5,7 +5,7 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 export class MailService {
   constructor() {}
 
-  async sendMail(emailId: string, message: string): Promise<SMTPTransport.SentMessageInfo> {
+  async sendMail(emailId: string, subject: string, message: string): Promise<SMTPTransport.SentMessageInfo> {
     var transporter: NodeMailer.Transporter<SMTPTransport.SentMessageInfo> = await NodeMailer.createTransport({
       host: SMTP_HOSTNAME,
       port: Number(SMTP_PORT) || 0, // SMTP PORT

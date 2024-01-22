@@ -18,7 +18,7 @@ describe("SMTP test", () => {
     });
 
     const mailService: MailService = new MailService();
-    const info: SMTPTransport.SentMessageInfo = await mailService.sendMail("dev@example.com", "Error Message");
+    const info: SMTPTransport.SentMessageInfo = await mailService.sendMail("dev@example.com", "test", "Error Message");
     expect(nodeMailerSpy).toHaveBeenCalled();
   });
 });

@@ -15,7 +15,7 @@ describe("SMTP test", () => {
     nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock, verify: () => {} });
 
     const mailService: MailService = new MailService();
-    const info: SMTPTransport.SentMessageInfo = await mailService.sendMail("dev@example.com", "Error Message");
+    const info: SMTPTransport.SentMessageInfo = await mailService.sendMail("dev@example.com", "test", "Error Message");
     expect(info).toBeDefined();
 
     expect(sendMailMock).toHaveBeenCalled();
@@ -27,7 +27,7 @@ describe("SMTP test", () => {
     nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock, verify: () => {} });
     const mailService: MailService = new MailService();
     try {
-      await mailService.sendMail("dev@example.com", "Error Message");
+      await mailService.sendMail("dev@example.com", "test", "Error Message");
       fail("Shouldn't have made it here");
     } catch (error) {
       expect(error).not.toBeUndefined();

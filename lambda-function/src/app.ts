@@ -59,12 +59,13 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     );
     logAndMail(`Transferred Measure id: ${response.id}`);
     console.log("Lambda execution completed...");
-    const result = await mailService.sendMail(emailId, emailMessage);
+    const result = await mailService.sendMail(emailId, "Successfully imported the Measure", emailMessage);
     return response;
   } catch (error: any) {
     console.log("Lambda Transfer Failed....sending email");
     logAndMail(error.message);
-    const result = await mailService.sendMail(emailId, emailMessage);
+    console.log(`Mailing the message ${emailMessage}`);
+    const result = await mailService.sendMail(emailId, "Failed to import the measure", emailMessage);
     console.error(`Lambda Transfer Failed because ${error.message}`);
 
     return madieMeasure;
