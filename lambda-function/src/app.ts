@@ -62,8 +62,6 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     const result = await mailService.sendMail(emailId, emailMessage);
     return response;
   } catch (error: any) {
-    // TODO: error email notification
-
     console.log("Lambda Transfer Failed....sending email");
     logAndMail(error.message);
     const result = await mailService.sendMail(emailId, emailMessage);
