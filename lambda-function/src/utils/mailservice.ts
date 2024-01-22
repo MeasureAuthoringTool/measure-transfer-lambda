@@ -22,7 +22,7 @@ export class MailService {
     });
 
     console.log("######## Transport Created", transporter);
-    console.log(`######## Sending email from "${FROM_EMAIL}" with message "${message}"`);
+    console.log(`######## Sending email from "${FROM_EMAIL}" with subject "${subject}" and message "${message}"`);
     await transporter.verify(function (error, success) {
       if (error) {
         console.log("Error establishing SMTPTransport", error);
