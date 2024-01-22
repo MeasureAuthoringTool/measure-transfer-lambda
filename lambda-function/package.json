@@ -45,6 +45,6 @@
     "fast-xml-parser": "^4.2.4",
     "lodash": "^4.17.21",
     "nodemailer": "^6.9.8",
-    "nodemailer-smtp-transport": "^2.7.4"
+    "nodemailer-smtp-transport": "^2.4.2"
   }
 }
