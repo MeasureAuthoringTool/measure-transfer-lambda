@@ -21,7 +21,7 @@ import { MADiE_SERVICE_URL, MADiE_API_KEY } from "./configs/configs";
  *
  */
 export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
-  let emailMessage: string = "";
+  let emailMessage = "";
   const logAndMail = (message: string) => {
     console.log(message);
     emailMessage = `${emailMessage}${message}\n`;
@@ -37,7 +37,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     Key: key,
   };
   let madieMeasure: Measure = {} as Measure;
-  let emailId: string = "";
+  let emailId = "";
   const mailService: MailService = new MailService();
   try {
     const { Body } = await s3Client.send(new GetObjectCommand(params));
@@ -62,16 +62,15 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     );
     logAndMail(`Transferred Measure id: ${response.id}`);
     console.log("Lambda execution completed...");
-    const result = await mailService.sendMail(emailId, "Successfully imported the Measure", emailMessage);
+    await mailService.sendMail(emailId, "Successfully imported the Measure", emailMessage);
     return response;
   } catch (error: any) {
     console.log("Lambda Transfer Failed....sending email");
-    logAndMail(parseError(error.message));
-    //TODO check to see if the error message is parseable
-
+    logAndMail("\nImporting resulted in the following error message:\n");
+    logAndMail(`\t${parseError(error.message)}`);
     console.log(`Mailing the error message ${emailMessage}`);
     if (emailId.length > 0) {
-      const result = await mailService.sendMail(emailId, "Failed to import the measure", emailMessage);
+      await mailService.sendMail(emailId, "Failed to import the measure", emailMessage);
     }
     console.error(`Lambda Transfer Failed because ${error.message}`);
 

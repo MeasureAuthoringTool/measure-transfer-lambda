@@ -1,4 +1,4 @@
-import NodeMailer, { Transporter } from "nodemailer";
+import NodeMailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 import MailService from "../../../src/utils/mailservice";
@@ -13,12 +13,14 @@ describe("SMTP test", () => {
     const nodeMailerSpy = jest.spyOn(NodeMailer, "createTransport").mockImplementation(() => {
       return {
         sendMail: sendMailMock,
-        verify: () => {},
+        verify: () => {
+          console.log("Mock Verify");
+        },
       } as unknown as NodeMailer.Transporter<SMTPTransport.SentMessageInfo>;
     });
 
     const mailService: MailService = new MailService();
-    const info: SMTPTransport.SentMessageInfo = await mailService.sendMail("dev@example.com", "test", "Error Message");
+    await mailService.sendMail("dev@example.com", "test", "Error Message");
     expect(nodeMailerSpy).toHaveBeenCalled();
   });
 });

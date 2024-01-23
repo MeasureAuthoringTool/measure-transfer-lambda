@@ -33,7 +33,7 @@ export class MailService {
     try {
       const info: SMTPTransport.SentMessageInfo = await transporter.sendMail({
         from: FROM_EMAIL, // sender address
-        to: "gregory.akins@icf.com, brendan.donohue@icf.com", // list of receivers
+        to: emailId, // list of receivers
         subject: subject, // Subject line
         text: message, // plain text body
       });

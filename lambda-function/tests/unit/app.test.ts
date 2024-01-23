@@ -270,10 +270,11 @@ describe("Unit test for lambda handler", () => {
     });
 
     try {
-      await lambdaHandler(event);
+      const measure = await lambdaHandler(event);
+      expect(measure).toBeDefined();
     } catch (error: any) {
       if (error instanceof Error) {
-        expect(error.message).toEqual('"Bad Request"');
+        fail("Shouldn't have reached this");
       }
     }
   });
