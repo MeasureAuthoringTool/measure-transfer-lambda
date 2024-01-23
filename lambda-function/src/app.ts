@@ -8,6 +8,7 @@ import { convertToMadieMeasure } from "./utils/measureConversionUtils";
 import { Measure } from "@madie/madie-models";
 import { MeasureServiceApi } from "./api/MeasureServiceApi";
 import MailService from "./utils/mailservice";
+import { parseError } from "./utils/resultutils";
 
 import { MADiE_SERVICE_URL, MADiE_API_KEY } from "./configs/configs";
 
@@ -36,14 +37,16 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     Key: key,
   };
   let madieMeasure: Measure = {} as Measure;
-  let emailId: string = "gregory.akins@icf.com";
+  let emailId: string = "";
   const mailService: MailService = new MailService();
   try {
     const { Body } = await s3Client.send(new GetObjectCommand(params));
     const bodyContents = await streamToString(Body as Readable);
     const matMeasure: MatMeasure = JSON.parse(bodyContents);
+
     logAndMail("--------MAT Measure Details-------");
     logAndMail(`User: ${matMeasure.harpId}`);
+    emailId = matMeasure.emailId;
     logAndMail(`Measure id: ${matMeasure?.manageMeasureDetailModel.id}`);
     logAndMail(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
     logAndMail(`Measure version: ${matMeasure?.manageMeasureDetailModel.versionNumber}`);
@@ -63,9 +66,13 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     return response;
   } catch (error: any) {
     console.log("Lambda Transfer Failed....sending email");
-    logAndMail(error.message);
+    logAndMail(parseError(error.message));
+    //TODO check to see if the error message is parseable
+
     console.log(`Mailing the error message ${emailMessage}`);
-    const result = await mailService.sendMail(emailId, "Failed to import the measure", emailMessage);
+    if (emailId.length > 0) {
+      const result = await mailService.sendMail(emailId, "Failed to import the measure", emailMessage);
+    }
     console.error(`Lambda Transfer Failed because ${error.message}`);
 
     return madieMeasure;

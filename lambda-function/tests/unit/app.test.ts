@@ -253,6 +253,31 @@ describe("Unit test for lambda handler", () => {
     }
   });
 
+  it("handles JSON formatted errors from MADiE service", async () => {
+    mockS3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream } as never);
+
+    mockedAxios.post.mockRejectedValueOnce({
+      status: 400,
+      response: {
+        data: {
+          timestamp: "2024-01-22T19:55:30.492+00:00",
+          status: 400,
+          error: "Bad Request",
+          message: "CQL library with given name already exists.",
+          validationErrors: { cqlLibraryName: "CQL library with given name already exists." },
+        },
+      },
+    });
+
+    try {
+      await lambdaHandler(event);
+    } catch (error: any) {
+      if (error instanceof Error) {
+        expect(error.message).toEqual('"Bad Request"');
+      }
+    }
+  });
+
   it("handles s3 exception if any", async () => {
     mockS3Client.send.mockImplementation(() => {
       throw new Error("Connection error");
@@ -287,7 +312,7 @@ describe("Unit test for lambda handler", () => {
       if (error instanceof Error) {
         expect(error.message).toBe("Empty Measure");
         const mailService: MailService = new MailService();
-        mailService.sendMail("name@example.com", "error message");
+        mailService.sendMail("name@example.com", "test", "error message");
         expect(MailService).toHaveBeenCalledTimes(1);
       }
     }

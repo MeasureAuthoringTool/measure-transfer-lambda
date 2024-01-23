@@ -21,7 +21,7 @@ describe("SMTP test", () => {
     expect(sendMailMock).toHaveBeenCalled();
   });
 
-  it("Calls SMTPClient and throws and error", async () => {
+  it("Calls SMTPClient and throws an error", async () => {
     const sendMailMock = jest.fn().mockRejectedValue(new Error("Error Message"));
 
     nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock, verify: () => {} });
