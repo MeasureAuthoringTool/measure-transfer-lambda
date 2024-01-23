@@ -7,7 +7,7 @@ interface ErrorMessage {
 
 export const parseError = (message: string): string => {
   try {
-    let err: ErrorMessage = JSON.parse(message);
+    const err: ErrorMessage = JSON.parse(message);
     if (err.message) {
       console.log("########## undefined", err.message);
       return err.message;
