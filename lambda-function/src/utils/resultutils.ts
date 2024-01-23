@@ -8,8 +8,8 @@ interface ErrorMessage {
 export const parseError = (message: string): string => {
   try {
     const err: ErrorMessage = JSON.parse(message);
+    //If the error message isn't parsed into the expected format, the message won't be defined (most likely).
     if (err.message) {
-      console.log("########## undefined", err.message);
       return err.message;
     }
     return message;
