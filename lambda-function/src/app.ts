@@ -61,6 +61,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
       matMeasure.harpId,
     );
     logAndMail(`Transferred Measure id: ${response.id}`);
+    emailMessage = `${emailMessage}\nYour measure transfer was successful.`;
     console.log("Lambda execution completed...");
     await mailService.sendMail(emailId, "Successfully imported the Measure", emailMessage);
     return response;
