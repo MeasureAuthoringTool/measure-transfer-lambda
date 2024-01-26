@@ -92,7 +92,7 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
 };
 
 // convert measure metadata level properties
-const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
+export const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
   const developers = measureDetails.measureDetailResult?.usedAuthorList?.map((author) => {
     return {
       name: author.authorName,
@@ -118,7 +118,9 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
     clinicalRecommendation: measureDetails.clinicalRecomms,
     references: references,
     endorsements: [endorsement],
-    definition: measureDetails.definitions,
+    measureDefinitions: !_.isEmpty(measureDetails.definitions)
+      ? [{ term: "", definition: measureDetails.definitions || "" }]
+      : [],
     experimental: measureDetails.experimental,
     transmissionFormat: measureDetails.transmissionFormat,
     // TODO: keep adding new metadata fields as we support them in MADiE
