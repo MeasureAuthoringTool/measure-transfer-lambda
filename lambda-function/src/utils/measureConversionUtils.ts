@@ -17,10 +17,9 @@ import { getPopulationsForScoring } from "./populationHelper";
 import { randomUUID } from "crypto";
 import { MatMeasureType } from "../models/MatMeasureTypes";
 import { XMLParser } from "fast-xml-parser";
+import { v4 as uuidv4 } from "uuid";
 import * as _ from "lodash";
 import { Stratification } from "@madie/madie-models/dist/Measure";
-// TODO: work out issue with loading ucum - typescript issue
-// @ts-ignore
 import * as ucum from "@lhncbc/ucum-lhc";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
@@ -119,7 +118,7 @@ export const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureM
     references: references,
     endorsements: [endorsement],
     measureDefinitions: !_.isEmpty(measureDetails.definitions)
-      ? [{ term: "", definition: measureDetails.definitions || "" }]
+      ? [{ id: uuidv4().toString(), term: "", definition: measureDetails.definitions || "" }]
       : [],
     experimental: measureDetails.experimental,
     transmissionFormat: measureDetails.transmissionFormat,

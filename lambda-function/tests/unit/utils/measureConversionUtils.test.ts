@@ -12,6 +12,8 @@ describe("Test convertMeasureMetadata", () => {
       matMeasure.manageMeasureDetailModel.definitions,
     );
     expect(madieMeasureMetadata.measureDefinitions?.[0].term).toBe("");
+    console.log("measureDefinitions?.[0].id", madieMeasureMetadata.measureDefinitions?.[0].id);
+    expect(madieMeasureMetadata.measureDefinitions?.[0].id).toBeTruthy();
   });
 
   it("Should return empty array for measureDefinitions when matMeasure doesn't contain any definition", () => {
