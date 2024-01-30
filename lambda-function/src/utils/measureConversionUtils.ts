@@ -19,8 +19,6 @@ import { MatMeasureType } from "../models/MatMeasureTypes";
 import { XMLParser } from "fast-xml-parser";
 import * as _ from "lodash";
 import { Stratification } from "@madie/madie-models/dist/Measure";
-// TODO: work out issue with loading ucum - typescript issue
-// @ts-ignore
 import * as ucum from "@lhncbc/ucum-lhc";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
@@ -92,7 +90,7 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
 };
 
 // convert measure metadata level properties
-const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
+export const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
   const developers = measureDetails.measureDetailResult?.usedAuthorList?.map((author) => {
     return {
       name: author.authorName,
@@ -118,7 +116,9 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
     clinicalRecommendation: measureDetails.clinicalRecomms,
     references: references,
     endorsements: [endorsement],
-    definition: measureDetails.definitions,
+    measureDefinitions: !_.isEmpty(measureDetails.definitions)
+      ? [{ id: randomUUID().toString(), term: "", definition: measureDetails.definitions || "" }]
+      : [],
     experimental: measureDetails.experimental,
     transmissionFormat: measureDetails.transmissionFormat,
     // TODO: keep adding new metadata fields as we support them in MADiE
