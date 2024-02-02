@@ -122,7 +122,7 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
 };
 
 // Assumption: If endorseByNQF is true then nqfId will not be empty
-// MAT-6566
+// MAT-6566 Endorsement will be defaulted to CBE for both Qi-Core and QDM measures
 const buildEndorsements = (measureDetails: MeasureDetails) => {
   const endorsements = [];
   if (measureDetails.endorseByNQF) {
