@@ -44,7 +44,7 @@
     "esbuild": "^0.14.14",
     "fast-xml-parser": "^4.2.4",
     "lodash": "^4.17.21",
-    "nodemailer": "^6.9.8",
+    "nodemailer": "^6.9.9",
     "nodemailer-smtp-transport": "^2.4.2"
   }
 }
