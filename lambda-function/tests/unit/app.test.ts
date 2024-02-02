@@ -76,6 +76,13 @@ describe("Unit test for lambda handler", () => {
     expect(madieMeasure.supplementalDataDescription).toEqual(matMeasure.manageMeasureDetailModel.supplementalData);
     expect(madieMeasure.riskAdjustmentDescription).toEqual(matMeasure.manageMeasureDetailModel.riskAdjustment);
 
+    expect(madieMeasure.measureMetaData?.endorsements?.length).toBe(1);
+    expect(madieMeasure.measureMetaData?.endorsements?.at(0)?.endorser).toEqual("CMS Consensus Based Entity");
+    expect(madieMeasure.measureMetaData?.endorsements?.at(0)?.endorsementId).toEqual(
+      matMeasure.manageMeasureDetailModel.nqfId,
+    );
+    expect(madieMeasure.measureMetaData?.endorsements?.at(0)?.endorserSystemId).toEqual("https://www.qualityforum.org");
+
     expect(mockS3Client.send).toHaveBeenCalled();
     expect(mockedAxios.post).toHaveBeenCalled();
   });
