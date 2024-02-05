@@ -99,11 +99,6 @@ export const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureM
   const references = measureDetails.referencesList?.map((reference: any) => {
     return reference;
   });
-  const endorsement = {
-    endorser: measureDetails.endorseByNQF ? "NQF" : "",
-    endorsementId: measureDetails.nqfId,
-    endorserSystemId: measureDetails.endorseByNQF ? "https://www.qualityforum.org" : "",
-  } as Endorsement;
   return {
     steward: { name: measureDetails.stewardValue },
     description: measureDetails.description,
@@ -115,7 +110,7 @@ export const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureM
     guidance: measureDetails.guidance,
     clinicalRecommendation: measureDetails.clinicalRecomms,
     references: references,
-    endorsements: [endorsement],
+    endorsements: buildEndorsements(measureDetails),
     measureDefinitions: !_.isEmpty(measureDetails.definitions)
       ? [{ id: randomUUID().toString(), term: "", definition: measureDetails.definitions || "" }]
       : [],
@@ -123,6 +118,20 @@ export const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureM
     transmissionFormat: measureDetails.transmissionFormat,
     // TODO: keep adding new metadata fields as we support them in MADiE
   };
+};
+
+// Assumption: If endorseByNQF is true then nqfId will not be empty
+// MAT-6566 Endorsement will be defaulted to CBE for both Qi-Core and QDM measures
+const buildEndorsements = (measureDetails: MeasureDetails) => {
+  const endorsements = [];
+  if (measureDetails.endorseByNQF) {
+    endorsements.push({
+      endorser: "CMS Consensus Based Entity",
+      endorsementId: measureDetails.nqfId,
+      endorserSystemId: "https://www.qualityforum.org",
+    });
+  }
+  return endorsements;
 };
 
 // convert populations
