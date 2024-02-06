@@ -19,8 +19,6 @@ import { MatMeasureType } from "../models/MatMeasureTypes";
 import { XMLParser } from "fast-xml-parser";
 import * as _ from "lodash";
 import { Stratification } from "@madie/madie-models/dist/Measure";
-// TODO: work out issue with loading ucum - typescript issue
-// @ts-ignore
 import * as ucum from "@lhncbc/ucum-lhc";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
@@ -92,7 +90,7 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
 };
 
 // convert measure metadata level properties
-const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
+export const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
   const developers = measureDetails.measureDetailResult?.usedAuthorList?.map((author) => {
     return {
       name: author.authorName,
@@ -101,11 +99,6 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
   const references = measureDetails.referencesList?.map((reference: any) => {
     return reference;
   });
-  const endorsement = {
-    endorser: measureDetails.endorseByNQF ? "NQF" : "",
-    endorsementId: measureDetails.nqfId,
-    endorserSystemId: measureDetails.endorseByNQF ? "https://www.qualityforum.org" : "",
-  } as Endorsement;
   return {
     steward: { name: measureDetails.stewardValue },
     description: measureDetails.description,
@@ -117,12 +110,28 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
     guidance: measureDetails.guidance,
     clinicalRecommendation: measureDetails.clinicalRecomms,
     references: references,
-    endorsements: [endorsement],
-    definition: measureDetails.definitions,
+    endorsements: buildEndorsements(measureDetails),
+    measureDefinitions: !_.isEmpty(measureDetails.definitions)
+      ? [{ id: randomUUID().toString(), term: "", definition: measureDetails.definitions || "" }]
+      : [],
     experimental: measureDetails.experimental,
     transmissionFormat: measureDetails.transmissionFormat,
     // TODO: keep adding new metadata fields as we support them in MADiE
   };
+};
+
+// Assumption: If endorseByNQF is true then nqfId will not be empty
+// MAT-6566 Endorsement will be defaulted to CBE for both Qi-Core and QDM measures
+const buildEndorsements = (measureDetails: MeasureDetails) => {
+  const endorsements = [];
+  if (measureDetails.endorseByNQF) {
+    endorsements.push({
+      endorser: "CMS Consensus Based Entity",
+      endorsementId: measureDetails.nqfId,
+      endorserSystemId: "https://www.qualityforum.org",
+    });
+  }
+  return endorsements;
 };
 
 // convert populations
