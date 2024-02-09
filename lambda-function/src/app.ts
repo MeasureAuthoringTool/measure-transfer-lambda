@@ -44,24 +44,21 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     const bodyContents = await streamToString(Body as Readable);
     const matMeasure: MatMeasure = JSON.parse(bodyContents);
 
-    logAndMail("--------MAT Measure Details-------");
+    madieMeasure = convertToMadieMeasure(matMeasure);
+    logAndMail("--------Measure Details-------");
     logAndMail(`User: ${matMeasure.harpId}`);
     emailId = matMeasure.emailId;
-    logAndMail(`Measure id: ${matMeasure?.manageMeasureDetailModel.id}`);
+    logAndMail(`Measure id in MAT: ${matMeasure?.manageMeasureDetailModel.id}`);
+    logAndMail(`Measure id in MADiE: ${madieMeasure?.id}`); //
     logAndMail(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
-    logAndMail(`Measure version: ${matMeasure?.manageMeasureDetailModel.versionNumber}`);
-    logAndMail(`Measure revisionNumber: ${matMeasure?.manageMeasureDetailModel.revisionNumber}`);
+    logAndMail('Measure version in MADiE: 0.0.000');
     logAndMail(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel.cqllibraryName}`);
     logAndMail(`CMS ID: ${matMeasure?.manageMeasureDetailModel.eMeasureId}`);
-    logAndMail("Converting measure from MAT to MADiE format");
-    madieMeasure = convertToMadieMeasure(matMeasure);
-    logAndMail("Transferring measure over to MADiE");
     const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
       madieMeasure,
       matMeasure.harpId,
     );
-    logAndMail(`Transferred Measure id: ${response.id}`);
-    emailMessage = `${emailMessage}\nYour measure transfer was successful.`;
+    emailMessage = `${emailMessage}\nSincerely,\nThe MADiE Support Team`;
     console.log("Lambda execution completed...");
     await mailService.sendMail(emailId, "Successfully imported the Measure", emailMessage);
     return response;
