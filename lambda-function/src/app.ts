@@ -38,43 +38,57 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
   };
   let madieMeasure: Measure = {} as Measure;
   let emailId = "";
+  let matMeasure = {} as MatMeasure;
   const mailService: MailService = new MailService();
+
   try {
     const { Body } = await s3Client.send(new GetObjectCommand(params));
     const bodyContents = await streamToString(Body as Readable);
-    const matMeasure: MatMeasure = JSON.parse(bodyContents);
-
-    logAndMail("--------MAT Measure Details-------");
-    logAndMail(`User: ${matMeasure.harpId}`);
-    emailId = matMeasure.emailId;
-    logAndMail(`Measure id: ${matMeasure?.manageMeasureDetailModel.id}`);
-    logAndMail(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
-    logAndMail(`Measure version: ${matMeasure?.manageMeasureDetailModel.versionNumber}`);
-    logAndMail(`Measure revisionNumber: ${matMeasure?.manageMeasureDetailModel.revisionNumber}`);
-    logAndMail(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel.cqllibraryName}`);
-    logAndMail(`CMS ID: ${matMeasure?.manageMeasureDetailModel.eMeasureId}`);
-    logAndMail("Converting measure from MAT to MADiE format");
+    matMeasure = JSON.parse(bodyContents);
     madieMeasure = convertToMadieMeasure(matMeasure);
-    logAndMail("Transferring measure over to MADiE");
+    emailId = matMeasure.emailId;
+
     const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
       madieMeasure,
       matMeasure.harpId,
     );
-    logAndMail(`Transferred Measure id: ${response.id}`);
-    emailMessage = `${emailMessage}\nYour measure transfer was successful.`;
-    console.log("Lambda execution completed...");
-    await mailService.sendMail(emailId, "Successfully imported the Measure", emailMessage);
+    if (response) {
+      /* Success email */
+      logAndMail("--------Measure Details-------");
+      logAndMail(`User: ${matMeasure.harpId}`);
+      logAndMail(`Measure id in MAT: ${matMeasure?.manageMeasureDetailModel.id}`);
+      logAndMail(`Measure id in MADiE: ${madieMeasure?.id}`); //
+      logAndMail(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
+      logAndMail("Measure version in MADiE: 0.0.000");
+      logAndMail(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel.cqllibraryName}`);
+      logAndMail(`CMS ID: ${matMeasure?.manageMeasureDetailModel.eMeasureId}`);
+      emailMessage = `${emailMessage}\nSincerely,\nThe MADiE Support Team`;
+      /* Success email end */
+      console.log("Lambda execution completed...");
+    }
+    await mailService.sendMail(emailId, "Successfully transferred your measure from MAT to MADiE", emailMessage);
     return response;
   } catch (error: any) {
     console.log("Lambda Transfer Failed....sending email");
-    logAndMail("\nImporting resulted in the following error message:\n");
+    /* Failure email  */
+    // header
+    logAndMail("\nTransferring your measure resulted in the following error message:\n");
     logAndMail(`\t${parseError(error.message)}`);
+    // body
+    logAndMail("\n--------Measure Details-------");
+    logAndMail(`User: ${matMeasure?.harpId}`);
+    logAndMail(`Measure id in MAT: ${matMeasure?.manageMeasureDetailModel?.id}`);
+    logAndMail(`Measure name: ${matMeasure?.manageMeasureDetailModel?.measureName}`);
+    logAndMail(`Measure version in MAT: ${matMeasure?.manageMeasureDetailModel?.versionNumber}`);
+    logAndMail(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel?.cqllibraryName}`);
+    logAndMail(`CMS ID: ${matMeasure?.manageMeasureDetailModel?.eMeasureId}`);
     console.log(`Mailing the error message ${emailMessage}`);
+    /* Failure email end  */
+
     if (emailId.length > 0) {
-      await mailService.sendMail(emailId, "Failed to import the measure", emailMessage);
+      await mailService.sendMail(emailId, "Failed to transfer your measure from MAT to MADiE", emailMessage);
     }
     console.error(`Lambda Transfer Failed because ${error.message}`);
-
     return madieMeasure;
   }
 };
