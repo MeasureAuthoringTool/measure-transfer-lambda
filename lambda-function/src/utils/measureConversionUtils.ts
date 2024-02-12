@@ -97,6 +97,7 @@ export const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureM
     };
   });
   const references = measureDetails.referencesList?.map((reference: any) => {
+    reference.id = randomUUID().toString();
     return reference;
   });
   return {
