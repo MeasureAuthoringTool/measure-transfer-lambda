@@ -57,14 +57,14 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
       /* Success email */
       logAndMail("--------Measure Details-------");
       logAndMail(`User: ${matMeasure.harpId}`);
-      logAndMail(`Measure id in MAT: ${matMeasure?.manageMeasureDetailModel.id}`);
-      logAndMail(`Measure id in MADiE: ${response.id}`); //
       logAndMail(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
       logAndMail("Measure version in MADiE: 0.0.000");
       logAndMail(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel.cqllibraryName}`);
       logAndMail(`CMS ID: ${matMeasure?.manageMeasureDetailModel.eMeasureId}`);
       emailMessage = `${emailMessage}\nSincerely,\nThe MADiE Support Team`;
       /* Success email end */
+      console.log(`Measure id in MADiE: ${response.id}`);
+      console.log(`Measure id in MAT: ${matMeasure?.manageMeasureDetailModel.id}`);
       console.log("Lambda execution completed...", response);
     }
     await mailService.sendMail(emailId, "Successfully transferred your measure from MAT to MADiE", emailMessage);
