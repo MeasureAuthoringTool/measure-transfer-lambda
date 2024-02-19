@@ -146,9 +146,13 @@ describe("Unit test for lambda handler", () => {
     expect(measureToTransfer.groups?.[0]?.scoring).toEqual("Ratio");
     expect(measureToTransfer.groups?.[0]?.populations?.length).toEqual(6); // two ips!
     expect(measureToTransfer.groups?.[0]?.populations?.[0]?.definition).toEqual("ipp");
+    expect(measureToTransfer.groups?.[0]?.populations?.[0]?.description).toEqual("initial pop description 1");
     expect(measureToTransfer.groups?.[0]?.populations?.[0]?.associationType).toEqual("Denominator");
+
     expect(measureToTransfer.groups?.[0]?.populations?.[1]?.definition).toEqual("ipp2");
     expect(measureToTransfer.groups?.[0]?.populations?.[1]?.associationType).toEqual("Numerator");
+    expect(measureToTransfer.groups?.[0]?.populations?.[2]?.description).toEqual("denominator description");
+    expect(measureToTransfer.groups?.[0]?.populations?.[4]?.description).toEqual("numerator description");
     expect(measureToTransfer.groups?.[0]?.measureObservations?.length).toEqual(2);
     const g1Obs1CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[0]?.criteriaReference;
     expect(g1Obs1CriteriaRef).toBeTruthy();
