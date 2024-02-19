@@ -112,9 +112,7 @@ export const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureM
     clinicalRecommendation: measureDetails.clinicalRecomms,
     references: references,
     endorsements: buildEndorsements(measureDetails),
-    measureDefinitions: !_.isEmpty(measureDetails.definitions)
-      ? [{ id: randomUUID().toString(), term: "", definition: measureDetails.definitions || "" }]
-      : [],
+    definition: measureDetails.definitions,
     experimental: measureDetails.experimental,
     transmissionFormat: measureDetails.transmissionFormat,
     // TODO: keep adding new metadata fields as we support them in MADiE
