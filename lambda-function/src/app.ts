@@ -46,11 +46,13 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     const bodyContents = await streamToString(Body as Readable);
     matMeasure = JSON.parse(bodyContents);
     madieMeasure = convertToMadieMeasure(matMeasure);
+    const cmsId = matMeasure.manageMeasureDetailModel.eMeasureId;
     emailId = matMeasure.emailId;
 
     const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
       madieMeasure,
       matMeasure.harpId,
+      cmsId,
     );
     // response should be measure according to tests.
     if (response) {
