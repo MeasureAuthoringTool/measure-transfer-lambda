@@ -8,6 +8,7 @@ import matCVMeasure from "./fixtures/measure_continuousVariable.json";
 import matRatioMeasure from "./fixtures/measure_ratio.json";
 import matDefaultMeasure from "./fixtures/measure_default.json";
 import matMeasureNoCmsId from "./fixtures/measure_noCmsId.json";
+import testMeasure from "./fixtures/test.json";
 import putEvent from "./fixtures/s3PutEvent.json";
 import matQdmCvMeasure from "./fixtures/measure_qdm.json";
 import matQdmDefaults from "./fixtures/measure_qdm_defaults.json";
@@ -153,6 +154,7 @@ describe("Unit test for lambda handler", () => {
     expect(measureToTransfer.groups?.[0]?.populations?.[1]?.associationType).toEqual("Numerator");
     expect(measureToTransfer.groups?.[0]?.populations?.[2]?.description).toEqual("denominator description");
     expect(measureToTransfer.groups?.[0]?.populations?.[4]?.description).toEqual("numerator description");
+    expect(measureToTransfer.groups?.[0]?.populations?.[5]?.description).toEqual("denominator description");
     expect(measureToTransfer.groups?.[0]?.measureObservations?.length).toEqual(2);
     const g1Obs1CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[0]?.criteriaReference;
     expect(g1Obs1CriteriaRef).toBeTruthy();
@@ -245,6 +247,39 @@ describe("Unit test for lambda handler", () => {
     expect(measureToTransfer.groups?.[0]?.stratifications).toBeTruthy();
     expect(measureToTransfer.groups?.[0]?.stratifications?.length).toEqual(2);
     // expect(measureToTransfer.groups[0].stratifications[0]).toEqual(1);
+  });
+
+  it("test QDM Proportion measure conversion", () => {
+    const measureToTransfer = convertToMadieMeasure(testMeasure as unknown as MatMeasure);
+    expect(measureToTransfer).toBeTruthy();
+    expect(measureToTransfer.measureName).toEqual("QdmProportionMeasure124567789895567");
+    expect(measureToTransfer.cqlLibraryName).toEqual("QdmProportionMeasure345789876789");
+    expect(measureToTransfer.scoring).toEqual("Proportion");
+    expect(measureToTransfer.patientBasis).toEqual(true);
+    expect(measureToTransfer.model).toEqual("QDM v5.6");
+    expect(measureToTransfer.groups).toBeTruthy();
+    expect(measureToTransfer.groups?.length).toEqual(2);
+    expect(measureToTransfer.supplementalData).toBeTruthy();
+    expect(measureToTransfer.supplementalData?.length).toEqual(4);
+    expect(measureToTransfer.riskAdjustments).toBeFalsy();
+
+    expect(measureToTransfer.groups?.[0]?.scoring).toEqual("Proportion");
+
+    expect(measureToTransfer.groups?.[0]?.populations?.length).toEqual(6); // two ips!
+    expect(measureToTransfer.groups?.[0]?.populations?.[0]?.definition).toEqual("Initial Population");
+    expect(measureToTransfer.groups?.[0]?.populations?.[0]?.description).toEqual(
+      "This is an Initial population text description",
+    );
+
+    expect(measureToTransfer.groups?.[0]?.populations?.[1]?.definition).toEqual("Denominator");
+    expect(measureToTransfer.groups?.[0]?.populations?.[1]?.description).toEqual(
+      "This is Denominator text description",
+    );
+    expect(measureToTransfer.groups?.[0]?.populations?.[3]?.description).toEqual(
+      "Denominator exclusion text description",
+    );
+    expect(measureToTransfer.groups?.[0]?.populations?.[4]?.description).toEqual("numerator description");
+    expect(measureToTransfer.groups?.[0]?.measureObservations).toBeFalsy();
   });
 
   it("handles validation errors from MADiE service", async () => {
