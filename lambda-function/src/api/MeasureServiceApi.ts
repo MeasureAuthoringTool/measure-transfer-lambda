@@ -6,10 +6,14 @@ export class MeasureServiceApi {
 
   async transferMeasureToMadie(measure: Measure, harpId: string): Promise<Measure> {
     try {
+      const sanitizedCmsId = measure?.cmsId?.replace(/[^0-9]/g, "");
       const response = await axios.post<Measure>(
         `${this.madieMeasureServiceUrl}/measure-transfer/mat-measures`,
         measure,
         {
+          params: {
+            cmsId: sanitizedCmsId,
+          },
           headers: {
             "api-key": this.apiKey,
             "harp-id": harpId,
