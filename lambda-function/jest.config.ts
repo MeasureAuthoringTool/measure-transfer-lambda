@@ -4,12 +4,11 @@
  */
 
 export default {
-  transform: { "\\.[jt]sx?$": "babel-jest" },
   clearMocks: true,
   collectCoverage: true,
   coverageDirectory: "coverage",
-  coverageProvider: "v8",
-  testMatch: ["**/tests/unit/*.test.ts"],
+  coverageProvider: "babel",
+  testMatch: ["**/tests/**/*.test.ts"],
   moduleNameMapper: {
     "^axios$": require.resolve("axios"),
   },

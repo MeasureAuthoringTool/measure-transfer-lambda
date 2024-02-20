@@ -19,8 +19,6 @@ import { MatMeasureType } from "../models/MatMeasureTypes";
 import { XMLParser } from "fast-xml-parser";
 import * as _ from "lodash";
 import { Stratification } from "@madie/madie-models/dist/Measure";
-// TODO: work out issue with loading ucum - typescript issue
-// @ts-ignore
 import * as ucum from "@lhncbc/ucum-lhc";
 
 const POPULATION_CODING_SYSTEM = "http://terminology.hl7.org/CodeSystem/measure-population";
@@ -29,7 +27,7 @@ const MEASURE_PROPERTY_MAPPINGS = {
   draft: "state",
   measureName: "measureName",
   cqlLibraryName: "cqlLibraryName",
-  measScoring: "measureScoring",
+  measScoring: "scoring",
   fhir: "model",
   measFromPeriod: "measurementPeriodStart",
   measToPeriod: "measurementPeriodEnd",
@@ -51,10 +49,6 @@ const POPULATION_CODE_MAPPINGS: { [key: string]: string } = {
   "measure-population": "measurePopulation",
   "measure-population-exclusion": "measurePopulationExclusion",
   "measure-observation": "measureObservation",
-};
-
-const getPopulationForQdmPopulationType = (qdmPop: string) => {
-  return qdmPop && qdmPop.endsWith("s") ? qdmPop.substring(0, qdmPop.length - 2) : qdmPop;
 };
 
 const CMS_IDENTIFIERR_SYSTEM = "http://hl7.org/fhir/cqi/ecqm/Measure/Identifier/cms";
@@ -96,20 +90,16 @@ const convertMeasureProperties = (measureDetails: MeasureDetails) => {
 };
 
 // convert measure metadata level properties
-const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
+export const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata => {
   const developers = measureDetails.measureDetailResult?.usedAuthorList?.map((author) => {
     return {
       name: author.authorName,
     };
   });
   const references = measureDetails.referencesList?.map((reference: any) => {
+    reference.id = randomUUID().toString();
     return reference;
   });
-  const endorsement = {
-    endorser: measureDetails.endorseByNQF ? "NQF" : "",
-    endorsementId: measureDetails.nqfId,
-    endorserSystemId: measureDetails.endorseByNQF ? "https://www.qualityforum.org" : "",
-  } as Endorsement;
   return {
     steward: { name: measureDetails.stewardValue },
     description: measureDetails.description,
@@ -121,12 +111,28 @@ const convertMeasureMetadata = (measureDetails: MeasureDetails): MeasureMetadata
     guidance: measureDetails.guidance,
     clinicalRecommendation: measureDetails.clinicalRecomms,
     references: references,
-    endorsements: [endorsement],
-    definition: measureDetails.definitions,
+    endorsements: buildEndorsements(measureDetails),
+    measureDefinitions: !_.isEmpty(measureDetails.definitions)
+      ? [{ id: randomUUID().toString(), term: "", definition: measureDetails.definitions || "" }]
+      : [],
     experimental: measureDetails.experimental,
     transmissionFormat: measureDetails.transmissionFormat,
     // TODO: keep adding new metadata fields as we support them in MADiE
   };
+};
+
+// Assumption: If endorseByNQF is true then nqfId will not be empty
+// MAT-6566 Endorsement will be defaulted to CBE for both Qi-Core and QDM measures
+const buildEndorsements = (measureDetails: MeasureDetails) => {
+  const endorsements = [];
+  if (measureDetails.endorseByNQF) {
+    endorsements.push({
+      endorser: "CMS Consensus Based Entity",
+      endorsementId: measureDetails.nqfId,
+      endorserSystemId: "https://www.qualityforum.org",
+    });
+  }
+  return endorsements;
 };
 
 // convert populations
@@ -191,7 +197,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
   const scoring: string = measureDetails.measScoring ?? MeasureScoring.COHORT;
   const allPopulations = getPopulationsForScoring(scoring);
 
-  return groups?.map((group: any) => {
+  const resultGroups = groups?.map((group: any) => {
     const ucumUnits = group["@_ucum"];
     const clauses = valueAsArray(group?.clause) ?? [];
 
@@ -257,7 +263,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
           } as Stratification;
         }),
     ];
-    return {
+    const result: Group = {
       id: undefined as unknown as string,
       scoring: measureDetails.measScoring,
       // populations: getAllPopulations(allPopulations, populations),
@@ -268,7 +274,9 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
       stratifications: _.isNil(stratifications) || _.isEmpty(stratifications) ? undefined : stratifications,
       populationBasis: `${measureDetails.patientBased}`,
     } as Group;
+    return result;
   });
+  return resultGroups;
 };
 
 // convert MAT measure groups to MADiE measure groups
@@ -410,7 +418,7 @@ export const getBaseConfigurationTypes = (
         types.add(BaseConfigurationTypes.PATIENT_ENGAGEMENT_OR_EXPERIENCE);
         break;
       case MatMeasureType.PATIENT_REPORTED_OUTCOME_PERFORMANCE:
-        types.add(BaseConfigurationTypes.PATIENT_REPORTED_OUTCOME);
+        types.add(BaseConfigurationTypes.PATIENT_REPORTED_OUTCOME_PERFORMANCE);
         break;
       default:
         types.add(BaseConfigurationTypes.OUTCOME);
@@ -539,7 +547,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     measureMetaData: measureMetaData,
     groups: measureGroups,
     cql: cql,
-    scoring: isQDM ? measureProperties.measureScoring : undefined,
+    scoring: isQDM ? measureProperties.scoring : undefined,
     version: buildVersion(measureDetails),
     cqlLibraryName: cqlLibraryName,
     createdBy: matMeasure.harpId,
