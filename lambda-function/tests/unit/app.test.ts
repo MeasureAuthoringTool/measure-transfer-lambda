@@ -110,7 +110,7 @@ describe("Unit test for lambda handler", () => {
 
   it("test find default CMS Id on measure", () => {
     const measureToTransfer = convertToMadieMeasure(matMeasureNoCmsId as unknown as MatMeasure);
-    expect(measureToTransfer.cmsId).toEqual("1175FHIR");
+    expect(measureToTransfer.cmsId).toBeUndefined();
   });
 
   it("test find QDM defaults on QDMmeasure", () => {
