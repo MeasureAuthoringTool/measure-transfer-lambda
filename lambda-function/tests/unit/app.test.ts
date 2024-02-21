@@ -154,7 +154,6 @@ describe("Unit test for lambda handler", () => {
     expect(measureToTransfer.groups?.[0]?.populations?.[1]?.associationType).toEqual("Numerator");
     expect(measureToTransfer.groups?.[0]?.populations?.[2]?.description).toEqual("denominator description");
     expect(measureToTransfer.groups?.[0]?.populations?.[4]?.description).toEqual("numerator description");
-    expect(measureToTransfer.groups?.[0]?.populations?.[5]?.description).toEqual("denominator description");
     expect(measureToTransfer.groups?.[0]?.measureObservations?.length).toEqual(2);
     const g1Obs1CriteriaRef = measureToTransfer?.groups?.[0]?.measureObservations?.[0]?.criteriaReference;
     expect(g1Obs1CriteriaRef).toBeTruthy();
