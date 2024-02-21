@@ -1,6 +1,5 @@
 import {
   BaseConfigurationTypes,
-  Endorsement,
   Group,
   Measure,
   MeasureGroupTypes,
@@ -154,16 +153,20 @@ export const getPopulationDescription = (type: string, measureDetails: MeasureDe
     case "numerator":
       return measureDetails.numerator;
     case "numeratorExclusion":
+    case "numeratorExclusions":
       return measureDetails.numeratorExclusions;
     case "denominator":
       return measureDetails.denominator;
     case "denominatorExclusion":
+    case "denominatorExclusions":
       return measureDetails.denominatorExclusions;
     case "denominatorException":
+    case "denominatorExceptions":
       return measureDetails.denominatorExceptions;
     case "measurePopulation":
       return measureDetails.measurePopulation;
     case "measurePopulationExclusion":
+    case "measurePopulationExclusions":
       return measureDetails.measurePopulationExclusions;
     case "measureObservation":
       return measureDetails.measureObservations;
