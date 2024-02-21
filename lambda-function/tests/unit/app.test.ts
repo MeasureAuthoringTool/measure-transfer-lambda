@@ -8,12 +8,12 @@ import matCVMeasure from "./fixtures/measure_continuousVariable.json";
 import matRatioMeasure from "./fixtures/measure_ratio.json";
 import matDefaultMeasure from "./fixtures/measure_default.json";
 import matMeasureNoCmsId from "./fixtures/measure_noCmsId.json";
-import testMeasure from "./fixtures/test.json";
 import putEvent from "./fixtures/s3PutEvent.json";
 import matQdmCvMeasure from "./fixtures/measure_qdm.json";
 import matQdmDefaults from "./fixtures/measure_qdm_defaults.json";
 import matQdmCvMeasureDefaultBaseConfigurationType from "./fixtures/measure_qdm_defaultBaseConfigurationType.json";
 import matQdmProportionMeasure from "./fixtures/measure_qdm_proportion.json";
+import matQdmProportionMeasure2 from "./fixtures/measure_qdm_proportion_2.json";
 import ucumUnitsMeasure from "./fixtures/measure_ucum_units.json";
 import matQdmRatioMeasure from "./fixtures/measure_qdm_ratio.json";
 import axios from "axios";
@@ -249,8 +249,8 @@ describe("Unit test for lambda handler", () => {
     // expect(measureToTransfer.groups[0].stratifications[0]).toEqual(1);
   });
 
-  it("test QDM Proportion measure conversion", () => {
-    const measureToTransfer = convertToMadieMeasure(testMeasure as unknown as MatMeasure);
+  it("test QDM Proportion measure conversion with descriptions", () => {
+    const measureToTransfer = convertToMadieMeasure(matQdmProportionMeasure2 as unknown as MatMeasure);
     expect(measureToTransfer).toBeTruthy();
     expect(measureToTransfer.measureName).toEqual("QdmProportionMeasure124567789895567");
     expect(measureToTransfer.cqlLibraryName).toEqual("QdmProportionMeasure345789876789");
@@ -265,7 +265,7 @@ describe("Unit test for lambda handler", () => {
 
     expect(measureToTransfer.groups?.[0]?.scoring).toEqual("Proportion");
 
-    expect(measureToTransfer.groups?.[0]?.populations?.length).toEqual(6); // two ips!
+    expect(measureToTransfer.groups?.[0]?.populations?.length).toEqual(6);
     expect(measureToTransfer.groups?.[0]?.populations?.[0]?.definition).toEqual("Initial Population");
     expect(measureToTransfer.groups?.[0]?.populations?.[0]?.description).toEqual(
       "This is an Initial population text description",
@@ -275,10 +275,12 @@ describe("Unit test for lambda handler", () => {
     expect(measureToTransfer.groups?.[0]?.populations?.[1]?.description).toEqual(
       "This is Denominator text description",
     );
-    expect(measureToTransfer.groups?.[0]?.populations?.[3]?.description).toEqual(
+    expect(measureToTransfer.groups?.[0]?.populations?.[2]?.definition).toEqual("Denominator");
+    expect(measureToTransfer.groups?.[0]?.populations?.[2]?.description).toEqual(
       "Denominator exclusion text description",
     );
-    expect(measureToTransfer.groups?.[0]?.populations?.[4]?.description).toEqual("numerator description");
+    expect(measureToTransfer.groups?.[0]?.populations?.[3]?.definition).toEqual("Numerator");
+    expect(measureToTransfer.groups?.[0]?.populations?.[4]?.definition).toEqual("Numerator");
     expect(measureToTransfer.groups?.[0]?.measureObservations).toBeFalsy();
   });
 
