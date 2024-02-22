@@ -83,6 +83,7 @@ describe("Unit test for lambda handler", () => {
       matMeasure.manageMeasureDetailModel.nqfId,
     );
     expect(madieMeasure.measureMetaData?.endorsements?.at(0)?.endorserSystemId).toEqual("https://www.qualityforum.org");
+    expect(madieMeasure.measureMetaData?.definition).toEqual(matMeasure.manageMeasureDetailModel.definitions);
 
     expect(mockS3Client.send).toHaveBeenCalled();
     expect(mockedAxios.post).toHaveBeenCalled();
