@@ -220,6 +220,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
           id: population["@_uuid"],
           aggregateMethod: population.cqlaggfunction["@_displayName"],
           definition: population.cqlaggfunction.cqlfunction["@_displayName"],
+          description: measureDetails.measureObservations,
           criteriaReference: criteriaReference,
         } as MeasureObservation;
       });
