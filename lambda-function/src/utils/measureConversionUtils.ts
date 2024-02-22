@@ -1,6 +1,5 @@
 import {
   BaseConfigurationTypes,
-  Endorsement,
   Group,
   Measure,
   MeasureGroupTypes,
@@ -154,16 +153,20 @@ export const getPopulationDescription = (type: string, measureDetails: MeasureDe
     case "numerator":
       return measureDetails.numerator;
     case "numeratorExclusion":
+    case "numeratorExclusions":
       return measureDetails.numeratorExclusions;
     case "denominator":
       return measureDetails.denominator;
     case "denominatorExclusion":
+    case "denominatorExclusions":
       return measureDetails.denominatorExclusions;
     case "denominatorException":
+    case "denominatorExceptions":
       return measureDetails.denominatorExceptions;
     case "measurePopulation":
       return measureDetails.measurePopulation;
     case "measurePopulationExclusion":
+    case "measurePopulationExclusions":
       return measureDetails.measurePopulationExclusions;
     case "measureObservation":
       return measureDetails.measureObservations;
@@ -217,6 +220,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
           id: population["@_uuid"],
           aggregateMethod: population.cqlaggfunction["@_displayName"],
           definition: population.cqlaggfunction.cqlfunction["@_displayName"],
+          description: measureDetails.measureObservations,
           criteriaReference: criteriaReference,
         } as MeasureObservation;
       });
