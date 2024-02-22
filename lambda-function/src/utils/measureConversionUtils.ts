@@ -1,6 +1,5 @@
 import {
   BaseConfigurationTypes,
-  Endorsement,
   Group,
   Measure,
   MeasureGroupTypes,
@@ -152,16 +151,20 @@ export const getPopulationDescription = (type: string, measureDetails: MeasureDe
     case "numerator":
       return measureDetails.numerator;
     case "numeratorExclusion":
+    case "numeratorExclusions":
       return measureDetails.numeratorExclusions;
     case "denominator":
       return measureDetails.denominator;
     case "denominatorExclusion":
+    case "denominatorExclusions":
       return measureDetails.denominatorExclusions;
     case "denominatorException":
+    case "denominatorExceptions":
       return measureDetails.denominatorExceptions;
     case "measurePopulation":
       return measureDetails.measurePopulation;
     case "measurePopulationExclusion":
+    case "measurePopulationExclusions":
       return measureDetails.measurePopulationExclusions;
     case "measureObservation":
       return measureDetails.measureObservations;
@@ -535,10 +538,6 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     ? getQdmMeasureLibraryNameAndCql(matMeasure)
     : getMeasureLibraryNameAndCql(matMeasure);
 
-  const cmsId = isQDM
-    ? matMeasure.manageMeasureDetailModel.eMeasureId
-    : getCmsId(matMeasure.fhirMeasureResourceJson, measureDetails);
-
   return {
     ...measureProperties,
     active: true,
@@ -557,7 +556,6 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
     supplementalDataDescription: measureDetails.supplementalData,
     riskAdjustmentDescription: measureDetails.riskAdjustment,
     baseConfigurationTypes: isQDM ? getBaseConfigurationTypes(measureDetails.measureTypeSelectedList) : undefined,
-    cmsId,
   } as Measure;
 };
 
@@ -586,14 +584,4 @@ const getAllPopulations = (allPopulations: Population[], selectedPopulations: Po
 
 const getSelected = (population: Population, selectedPopulations: Population[]): Population | undefined => {
   return selectedPopulations.find((pop) => pop.name === population.name);
-};
-
-const getCmsId = (measureResourceJson: string, measureDetails: MeasureDetails): string => {
-  const measureResource = JSON.parse(measureResourceJson);
-  const identifiers = measureResource.identifier;
-  let cmsIdentifier = identifiers?.find((identifier: any) => identifier.system === CMS_IDENTIFIERR_SYSTEM)?.value;
-  if (!cmsIdentifier && measureDetails.eMeasureId !== 0) {
-    cmsIdentifier = measureDetails.eMeasureId + "FHIR";
-  }
-  return cmsIdentifier;
 };
