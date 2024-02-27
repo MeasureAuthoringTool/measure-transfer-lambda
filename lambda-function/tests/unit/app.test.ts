@@ -128,16 +128,16 @@ describe("Unit test for lambda handler", () => {
     expect(logSpy).toHaveBeenCalledWith("CMS ID: 12345");
   });
 
-  it("cmsID is not when not present on success", async () => {
+  it("cmsID is not logged not when not present on success", async () => {
     const logSpy = jest.spyOn(console, "log");
-    const measureToTransfer = convertToMadieMeasure(matMeasure as unknown as MatMeasure);
+    const measureToTransfer = convertToMadieMeasure(matMeasureNoCmsId as unknown as MatMeasure);
     mockedAxios.post.mockResolvedValue({ data: measureToTransfer });
     mockS3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream } as never);
     await lambdaHandler(event);
 
     expect(mockS3Client.send).toHaveBeenCalled();
     expect(mockedAxios.post).toHaveBeenCalled();
-    expect(logSpy).toHaveBeenCalledWith("CMS ID: 12345");
+    expect(logSpy).not.toHaveBeenCalledWith("CMS ID: 0");
   });
 
   it("cmsID is logged when present on fail", async () => {
