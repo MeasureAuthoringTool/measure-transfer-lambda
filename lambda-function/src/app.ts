@@ -39,6 +39,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
   let madieMeasure: Measure = {} as Measure;
   let emailId = "";
   let matMeasure = {} as MatMeasure;
+  let cmsId;
   const mailService: MailService = new MailService();
 
   try {
@@ -46,7 +47,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     const bodyContents = await streamToString(Body as Readable);
     matMeasure = JSON.parse(bodyContents);
     madieMeasure = convertToMadieMeasure(matMeasure);
-    const cmsId = matMeasure.manageMeasureDetailModel.eMeasureId;
+    const cmsId = matMeasure.manageMeasureDetailModel?.eMeasureId;
     emailId = matMeasure.emailId;
 
     const response = await new MeasureServiceApi(MADiE_SERVICE_URL, MADiE_API_KEY).transferMeasureToMadie(
@@ -62,7 +63,9 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
       logAndMail(`Measure name: ${matMeasure?.manageMeasureDetailModel.measureName}`);
       logAndMail("Measure version in MADiE: 0.0.000");
       logAndMail(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel.cqllibraryName}`);
-      logAndMail(`CMS ID: ${matMeasure?.manageMeasureDetailModel.eMeasureId}`);
+      if (cmsId) {
+        logAndMail(`CMS ID: ${cmsId}`);
+      }
       emailMessage = `${emailMessage}\nSincerely,\nThe MADiE Support Team`;
       /* Success email end */
       console.log(`Measure id in MADiE: ${response.id}`);
@@ -84,7 +87,9 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     logAndMail(`Measure name: ${matMeasure?.manageMeasureDetailModel?.measureName}`);
     logAndMail(`Measure version in MAT: ${matMeasure?.manageMeasureDetailModel?.versionNumber}`);
     logAndMail(`Measure cqlLibraryName: ${matMeasure?.manageMeasureDetailModel?.cqllibraryName}`);
-    logAndMail(`CMS ID: ${matMeasure?.manageMeasureDetailModel?.eMeasureId}`);
+    if (cmsId) {
+      logAndMail(`CMS ID: ${cmsId}`);
+    }
     console.log(`Mailing the error message ${emailMessage}`);
     /* Failure email end  */
 
