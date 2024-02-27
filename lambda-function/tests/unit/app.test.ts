@@ -43,7 +43,11 @@ const mailServiceMockResolved = {
     return null;
   }),
 } as unknown as MailService;
-
+const mailServiceMockRejected = {
+  sendMail: jest.fn().mockRejectedValue(() => {
+    return null;
+  }),
+} as unknown as MailService;
 describe("Unit test for lambda handler", () => {
   let event: S3Event;
   let readableDataStream: Readable;
@@ -59,9 +63,7 @@ describe("Unit test for lambda handler", () => {
   it("reads s3 object and transfer it over to MADiE successfully", async () => {
     const measureToTransfer = convertToMadieMeasure(matMeasure as unknown as MatMeasure);
     mockedAxios.post.mockResolvedValue({ data: measureToTransfer });
-
     mockS3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream } as never);
-
     const madieMeasure: Measure = await lambdaHandler(event);
     expect(madieMeasure.measureName).toEqual(matMeasure.manageMeasureDetailModel.measureName);
     expect(madieMeasure.version).toEqual("0.0.1");
@@ -84,7 +86,6 @@ describe("Unit test for lambda handler", () => {
     );
     expect(madieMeasure.measureMetaData?.endorsements?.at(0)?.endorserSystemId).toEqual("https://www.qualityforum.org");
     expect(madieMeasure.measureMetaData?.definition).toEqual(matMeasure.manageMeasureDetailModel.definitions);
-
     expect(mockS3Client.send).toHaveBeenCalled();
     expect(mockedAxios.post).toHaveBeenCalled();
   });
@@ -112,6 +113,59 @@ describe("Unit test for lambda handler", () => {
   it("test find default CMS Id on measure", () => {
     const measureToTransfer = convertToMadieMeasure(matMeasureNoCmsId as unknown as MatMeasure);
     expect(measureToTransfer.cmsId).toBeUndefined();
+  });
+
+  it("cmsID is logged when present on success", async () => {
+    const logSpy = jest.spyOn(console, "log");
+    const measureToTransfer = convertToMadieMeasure(matMeasure as unknown as MatMeasure);
+    mockedAxios.post.mockResolvedValue({ data: measureToTransfer });
+    mockS3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream } as never);
+    await lambdaHandler(event);
+
+    expect(mockS3Client.send).toHaveBeenCalled();
+    expect(mockedAxios.post).toHaveBeenCalled();
+    expect(logSpy).not.toHaveBeenCalledWith("CMS ID: 0");
+    expect(logSpy).toHaveBeenCalledWith("CMS ID: 12345");
+  });
+
+  it("cmsID is not when not present on success", async () => {
+    const logSpy = jest.spyOn(console, "log");
+    const measureToTransfer = convertToMadieMeasure(matMeasure as unknown as MatMeasure);
+    mockedAxios.post.mockResolvedValue({ data: measureToTransfer });
+    mockS3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream } as never);
+    await lambdaHandler(event);
+
+    expect(mockS3Client.send).toHaveBeenCalled();
+    expect(mockedAxios.post).toHaveBeenCalled();
+    expect(logSpy).toHaveBeenCalledWith("CMS ID: 12345");
+  });
+
+  it("cmsID is logged when present on fail", async () => {
+    mailServiceMock.mockImplementation(() => {
+      return mailServiceMockRejected;
+    });
+    const logSpy = jest.spyOn(console, "log");
+    mockS3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream } as never);
+    const measureToTransfer = convertToMadieMeasure(matMeasureNoCmsId as unknown as MatMeasure);
+    mockedAxios.post.mockResolvedValue({ data: measureToTransfer });
+    await lambdaHandler(event);
+
+    expect(mockS3Client.send).toHaveBeenCalled();
+    expect(mockedAxios.post).toHaveBeenCalled();
+    expect(logSpy).toHaveBeenCalledWith("CMS ID: 12345");
+  });
+  it("cmsID is not when not present on fail", async () => {
+    mailServiceMock.mockImplementation(() => {
+      return mailServiceMockRejected;
+    });
+    const logSpy = jest.spyOn(console, "log");
+    mockS3Client.send.mockResolvedValue({ ContentType: "binary/octet-stream", Body: readableDataStream } as never);
+    const measureToTransfer = convertToMadieMeasure(matMeasureNoCmsId as unknown as MatMeasure);
+    mockedAxios.post.mockResolvedValue({ data: measureToTransfer });
+    await lambdaHandler(event);
+    expect(mockS3Client.send).toHaveBeenCalled();
+    expect(mockedAxios.post).toHaveBeenCalled();
+    expect(logSpy).not.toHaveBeenCalledWith("CMS ID: 0");
   });
 
   it("test find QDM defaults on QDMmeasure", () => {
