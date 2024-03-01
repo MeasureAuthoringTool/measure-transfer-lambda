@@ -1,19 +1,11 @@
-interface ErrorMessage {
-  timestamp: Date;
-  status: string;
-  message: string | undefined;
-  validationErrors: any;
-}
-
-export const parseError = (message: string): string => {
-  try {
-    const err: ErrorMessage = JSON.parse(message);
-    //If the error message isn't parsed into the expected format, the message won't be defined (most likely).
-    if (err.message) {
-      return err.message;
+export const parseError = (validationErrors: any, message: string) => {
+  if (validationErrors && Object.keys(validationErrors).length > 0) {
+    const errorValues = Object.values(validationErrors);
+    if (Object.keys(validationErrors).length === 1) {
+      return errorValues[0];
+    } else {
+      return errorValues?.map((error, index) => `${index + 1}. ${error}`).join("\n");
     }
-    return message;
-  } catch (error) {
-    return message;
   }
+  return message;
 };

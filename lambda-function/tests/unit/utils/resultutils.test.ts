@@ -1,20 +1,22 @@
 import { parseError } from "../../../src/utils/resultutils";
 
 describe("resultutils", () => {
-  it("parses json correctly", () => {
-    const jsonString =
-      '{"timestamp":"2024-01-22T19:55:30.492+00:00","status":400,"error":"Bad Request","message":"CQL library with given name already exists.","validationErrors":{"cqlLibraryName":"CQL library with given name already exists."}}';
-    const result = parseError(jsonString);
-    expect(result).toEqual("CQL library with given name already exists.");
+  it("parse validation errors", () => {
+    const errorMessage = {
+      timestamp: "2024-01-22T19:55:30.492+00:00",
+      status: 400,
+      error: "Bad Request",
+      message: "Validation failed for object='measure'. Error count: 1",
+      validationErrors: {
+        cqlLibraryName: "CQL library with given name already exists.",
+        measureName: "Measure Name is required.",
+      },
+    };
+    const result = parseError(errorMessage?.validationErrors, errorMessage?.message);
+    expect(result).toEqual("1. CQL library with given name already exists.\n2. Measure Name is required.");
   });
-  it("doesn't parse when not json", () => {
-    const jsonString = "This is just an error";
-    const result = parseError(jsonString);
+  it("parser message from the error", () => {
+    const result = parseError(null, "This is just an error");
     expect(result).toEqual("This is just an error");
-  });
-  it.only("Parses JSON that isn't a correct ErrorMessage", () => {
-    const jsonString = '{"result":"This is just an error"}';
-    const result = parseError(jsonString);
-    expect(result).toEqual('{"result":"This is just an error"}');
   });
 });

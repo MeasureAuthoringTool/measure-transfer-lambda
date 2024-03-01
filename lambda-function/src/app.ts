@@ -79,7 +79,7 @@ export const lambdaHandler = async (event: S3Event): Promise<Measure> => {
     /* Failure email  */
     // header
     logAndMail("\nTransferring your measure resulted in the following error message:\n");
-    logAndMail(`\t${parseError(error.message)}`);
+    logAndMail(`\t${parseError(error?.validationErrors, error?.message)}`);
     // body
     logAndMail("\n--------Measure Details-------");
     logAndMail(`User: ${matMeasure?.harpId}`);
