@@ -1,7 +1,7 @@
 import { parseError } from "../../../src/utils/resultutils";
 
 describe("resultutils", () => {
-  it("parse validation errors", () => {
+  it("parse errors when there are multiple validation errors", () => {
     const errorMessage = {
       timestamp: "2024-01-22T19:55:30.492+00:00",
       status: 400,
@@ -15,6 +15,21 @@ describe("resultutils", () => {
     const result = parseError(errorMessage?.validationErrors, errorMessage?.message);
     expect(result).toEqual("1. CQL library with given name already exists.\n2. Measure Name is required.");
   });
+
+  it("parse errors when there is only one validation error", () => {
+    const errorMessage = {
+      timestamp: "2024-01-22T19:55:30.492+00:00",
+      status: 400,
+      error: "Bad Request",
+      message: "Validation failed for object='measure'. Error count: 1",
+      validationErrors: {
+        cqlLibraryName: "CQL library with given name already exists.",
+      },
+    };
+    const result = parseError(errorMessage?.validationErrors, errorMessage?.message);
+    expect(result).toEqual("CQL library with given name already exists.");
+  });
+
   it("parser message from the error", () => {
     const result = parseError(null, "This is just an error");
     expect(result).toEqual("This is just an error");
