@@ -258,6 +258,7 @@ export const convertQdmMeasureGroups = (simpleXml: string, measureDetails: Measu
           const stratRefPop = clauses.find((refPop: any) => refPop?.cqldefinition?.["@_displayName"] === stratDefine);
 
           return {
+            id: population["@_uuid"],
             cqlDefinition: stratDefine,
             // attempt to match association based on define
             // association is required in MADiE..so default to IP per getPopulationType
