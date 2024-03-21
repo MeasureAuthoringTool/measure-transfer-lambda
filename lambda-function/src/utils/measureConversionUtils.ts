@@ -32,7 +32,6 @@ const MEASURE_PROPERTY_MAPPINGS = {
   measToPeriod: "measurementPeriodEnd",
   populationBasis: "populationBasis",
   patientBased: "patientBasis",
-  id: "versionId",
   shortName: "ecqmTitle",
   supplementalData: "supplementalDataDescription",
   riskAdjustment: "riskAdjustmentDescription",
@@ -542,6 +541,7 @@ export const convertToMadieMeasure = (matMeasure: MatMeasure): Measure => {
 
   return {
     ...measureProperties,
+    versionId: randomUUID(),
     active: true,
     measureMetaData: measureMetaData,
     groups: measureGroups,

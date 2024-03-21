@@ -67,6 +67,7 @@ describe("Unit test for lambda handler", () => {
     const madieMeasure: Measure = await lambdaHandler(event);
     expect(madieMeasure.measureName).toEqual(matMeasure.manageMeasureDetailModel.measureName);
     expect(madieMeasure.version).toEqual("0.0.1");
+    expect(madieMeasure.versionId).not.toBeNull();
     expect(madieMeasure.cqlLibraryName).toEqual(matMeasure.manageMeasureDetailModel.cqllibraryName);
     expect(madieMeasure.scoring).toBeUndefined();
     expect(madieMeasure.model).toEqual(Model.QICORE);
